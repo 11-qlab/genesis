@@ -141,3 +141,6 @@ Discarded from T13 multi-run dataset.
 T13-basic multi-run: 4 samples (0.80, 0.85, 0.90, 0.95, mean 0.875)
 vs greedy 3 (0.75, 0.80, 0.80, mean 0.7833). Delta +0.09, below noise
 band. No conclusion beyond that.
+
+## T13 on a 3B model — phone deployment (2026-10-21)
+...
