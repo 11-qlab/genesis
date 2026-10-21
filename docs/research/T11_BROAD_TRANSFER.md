@@ -142,5 +142,23 @@ T13-basic multi-run: 4 samples (0.80, 0.85, 0.90, 0.95, mean 0.875)
 vs greedy 3 (0.75, 0.80, 0.80, mean 0.7833). Delta +0.09, below noise
 band. No conclusion beyond that.
 
+
 ## T13 on a 3B model — phone deployment (2026-10-21)
-...
+
+Dolphin 3.0 Llama 3.2 3B Q4_K_M, llama.cpp on 4 CPU threads.
+
+**Greedy: 0/5. Revision-basic: 0/5. No rescue at this tier.**
+
+Three failure modes on 3B:
+
+1. **Escape without recovery.** Items 1, 3, 4, 5: `[fs_read, fs_list, fs_read]` — reads, fails on "not a file", lists, retries the same read. Never calls `fs_write`.
+
+2. **Path hallucination.** Items 4, 5: prepends `sandbox_root/` to every path, which doubles inside the sandbox and returns `not found`.
+
+3. **Revision schema violation.** All three revision attempts rejected by pydantic: `steps.N.title Field required`. The initial planner prompt elicits `title`; the revision prompt does not. Same model, two elicitations, two compliance rates.
+
+Item 2 (er-02) produced `[fs_read, fs_list, fs_list, fs_read, fs_write, fs_read]`, which contains the required subsequence. The run still scored failed because the final status was `failed` — the model wrote to `result.txt` (literal goal) instead of recovering `secret.txt`. The scorer requires `status: succeeded` AND the subsequence, and only the first failed.
+
+**Conclusion:** T13 is capability-gated. At 3B tier, revision cannot rescue the recovery failure because the model cannot produce schema-valid revision plans. Revision helps only when the base model is already capable of the task — it accelerates improvement, it does not create capability.
+
+**Infrastructure finding:** default provider timeout is 60s x 3 attempts = 180s. Any on-device model below ~10 tok/s times out 100% of planner calls. Raise via `AGI_PROVIDER_TIMEOUT_S=600`. Verified: 0 timeouts at 600s across 10 planner calls (greedy + revision, 5 items each).
