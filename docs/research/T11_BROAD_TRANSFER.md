@@ -102,3 +102,42 @@ sequence, and `fs_exists` lets the model pre-check rather than fail
 blind. This is the same class of brittleness as T9's novel-ordering
 check: the benchmark rewards a specific shape of wrongness, not the
 goal.
+
+## Follow-up — mechanism identified (2026-10-20)
+
+20-tool error_recovery re-run with per-item `tool_sequence` exposed.
+
+    summary: accuracy=0.55, passed=11/20, rl=1
+
+### Failing items never call fs_write
+
+9 of 9 annotated failures show the same signature:
+
+    ['fs_exists', 'fs_read', 'fs_exists', 'fs_list', 'fs_glob']
+
+The model pre-checks with fs_exists, reads (fails, missing file), then
+escapes into cheap inspection tools (fs_list, fs_glob) instead of the
+creating tool. Coordinator recovery only fires when a step's ok=False;
+fs_list/fs_glob return empty Ok=True, so no failure surfaces to
+trigger recovery.
+
+### Passing items reach fs_write via longer detour
+
+    ['fs_exists', 'fs_read', 'fs_exists', 'fs_list', 'fs_write', 'fs_read']
+
+Subsequence intact, item passes, but at higher token cost.
+
+### Mechanism in one sentence
+
+Extended catalog gives the model escape routes after failure that the
+benchmark doesn't expect, and it prefers the cheap ones over fs_write.
+
+### Two extra greedy + two extra T13-basic runs invalidated
+
+Four new runs (greedy 0.60, 0.55; T13-basic 0.20, 0.15) were 20-tool,
+not 5-tool: AGI_TOOLS_EXTENDED=1 leaked from an earlier diagnostic.
+Discarded from T13 multi-run dataset.
+
+T13-basic multi-run: 4 samples (0.80, 0.85, 0.90, 0.95, mean 0.875)
+vs greedy 3 (0.75, 0.80, 0.80, mean 0.7833). Delta +0.09, below noise
+band. No conclusion beyond that.
