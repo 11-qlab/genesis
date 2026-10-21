@@ -49,7 +49,7 @@ class ProviderConfig(BaseModel):
     base_url: str = "http://127.0.0.1:8000/v1"
     model: str = "deepseek-chat"
     api_key_env: str = "AGI_API_KEY"
-    timeout_s: float = 60.0
+    timeout_s: float = 600.0
     max_retries: int = 2
     supports_streaming: bool = True
 
