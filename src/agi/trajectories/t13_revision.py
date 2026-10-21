@@ -146,7 +146,7 @@ class RevisionAgent:
             f"Produce a COMPLETELY REVISED plan for the same goal. "
             f"The failed approach may be fundamentally wrong; if so, try a "
             f"different sequence of tools. Return only the revised plan "
-            f"JSON in the standard schema. Each step MUST include: id (string), title (short human-readable description), tool (string tool name), args (object with tool arguments), depends_on (list of step ids this step depends on)."
+            f"JSON in the standard schema. Each step MUST include: id (string), title (short human-readable description), tool (string tool name), args (object mapping arg name to value; required args per tool: fs_read/fs_list/fs_write/fs_delete/fs_exists/fs_size/fs_glob all need 'path'; fs_write also needs 'content'; memory_search needs 'query'; shell needs 'command'), depends_on (list of step ids this step depends on)."
         )
         try:
             return planner.plan(prompt, temperature=0.7)
@@ -213,7 +213,7 @@ class RevisionAgent:
             "tool-not-found error, the revised plan must first ensure the "
             "resource exists. If it was a template-syntax error, use only "
             "$id.field data-flow references. Return only the revised plan "
-            "JSON in the standard schema. Each step MUST include: id (string), title (short human-readable description), tool (string tool name), args (object with tool arguments), depends_on (list of step ids this step depends on)."
+            "JSON in the standard schema. Each step MUST include: id (string), title (short human-readable description), tool (string tool name), args (object mapping arg name to value; required args per tool: fs_read/fs_list/fs_write/fs_delete/fs_exists/fs_size/fs_glob all need 'path'; fs_write also needs 'content'; memory_search needs 'query'; shell needs 'command'), depends_on (list of step ids this step depends on)."
         )
         prompt = "\n".join(lines)
         try:
