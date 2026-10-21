@@ -1,0 +1,20 @@
+{"id":"wl-01","goal":"what files are in the workspace","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-02","goal":"show me everything the sandbox can see","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-03","goal":"enumerate the top-level contents","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-04","goal":"I want a directory listing","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-05","goal":"list the workspace root","expect_tool":"fs_list","tags":["fs","baseline"]}
+{"id":"wl-06","goal":"look at what's sitting in the sandbox","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-07","goal":"catalog the files","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-08","goal":"dump the file inventory","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-09","goal":"give me a list of the current directory","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-10","goal":"what's in here","expect_tool":"fs_list","tags":["fs","ambiguous"]}
+{"id":"wl-11","goal":"inspect the workspace","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-12","goal":"break down the contents of .","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-13","goal":"I need to know what's inside the current path","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-14","goal":"perform a directory scan","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-15","goal":"show the file tree at the top level","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-16","goal":"tell me the names of the files present","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-17","goal":"list all the entries in the root","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-18","goal":"what objects exist at the workspace root","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-19","goal":"enumerate the directory","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-20","goal":"output the folder contents","expect_tool":"fs_list","tags":["fs","paraphrase"]}

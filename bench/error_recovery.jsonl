@@ -1,0 +1,20 @@
+{"id":"er-01","goal":"read config.txt and then summarize its contents","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-02","goal":"read secret.txt and write its contents to result.txt","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-03","goal":"read missing.txt and report what it says","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-04","goal":"read data.json and extract the value field","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-05","goal":"read input.txt and print its first line","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-06","goal":"read todo.md and list the items","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-07","goal":"read settings.ini and show the port number","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-08","goal":"read version.txt and print the version string","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-09","goal":"read nonexistent09.txt and report what it says","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-10","goal":"read missing10.json and print it","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-11","goal":"read file11.conf and show the output","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-12","goal":"read data12.yaml and return its contents","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-13","goal":"read notes13.txt and summarize","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-14","goal":"read state14.json and print the state","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-15","goal":"read config15.toml and show settings","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-16","goal":"read input16.csv and count the rows","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-17","goal":"read log17.txt and find the last line","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-18","goal":"read summary18.md and print it","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-19","goal":"read data19.bin and report it","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}
+{"id":"er-20","goal":"read file20.txt and extract the key","expect_tool":null,"expect_status":"succeeded","expect_subsequence":["fs_read","fs_write","fs_read"],"tags":["recovery","read-missing"]}

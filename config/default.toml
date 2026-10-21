@@ -1,0 +1,26 @@
+[provider]
+name = "echo"
+kind = "echo"
+base_url = "http://127.0.0.1:8000/v1"
+model = "deepseek-chat"
+api_key_env = "AGI_API_KEY"
+timeout_s = 60.0
+max_retries = 2
+supports_streaming = true
+
+[runtime]
+log_level = "INFO"
+log_json = false
+max_tool_calls = 32
+max_tokens_budget = 200000
+max_wall_clock_s = 900
+
+[storage]
+path = "state/agi.sqlite3"
+
+[tools]
+enabled = ["fs_list", "fs_read", "fs_write"]
+fs_root = "state/workspace"
+shell_enabled = false
+shell_allowlist = []
+shell_timeout_s = 10

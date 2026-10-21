@@ -1,0 +1,3 @@
+{"id": "ws-list", "goal": "list workspace", "expect_tool": "fs_list", "expect_status": "succeeded", "tags": ["fs", "basic"]}
+{"id": "ws-list-alt", "goal": "list the files in workspace", "expect_tool": "fs_list", "expect_status": "succeeded", "tags": ["fs", "basic"]}
+{"id": "ws-list-third", "goal": "list everything", "expect_tool": "fs_list", "expect_status": "succeeded", "tags": ["fs", "basic"]}

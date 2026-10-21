@@ -1,0 +1,10 @@
+{"id":"wl-11","goal":"inspect the workspace","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-12","goal":"break down the contents of .","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-13","goal":"I need to know what's inside the current path","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-14","goal":"perform a directory scan","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-15","goal":"show the file tree at the top level","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-16","goal":"tell me the names of the files present","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-17","goal":"list all the entries in the root","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-18","goal":"what objects exist at the workspace root","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-19","goal":"enumerate the directory","expect_tool":"fs_list","tags":["fs","paraphrase"]}
+{"id":"wl-20","goal":"output the folder contents","expect_tool":"fs_list","tags":["fs","paraphrase"]}

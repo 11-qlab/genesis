@@ -1,0 +1,14 @@
+[provider]
+name = "echo"
+kind = "echo"
+
+[runtime]
+log_level = "DEBUG"
+log_json = false
+
+[tools]
+enabled = ["fs_list", "fs_read", "fs_write", "shell"]
+fs_root = "state/workspace"
+shell_enabled = true
+shell_allowlist = ["echo", "ls", "cat", "pwd"]
+shell_timeout_s = 10
