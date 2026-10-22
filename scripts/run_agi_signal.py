@@ -202,7 +202,71 @@ def mode_contamination(delay_ms):
     print(f"\n  wrote {out}")
 
 
+
+def _check_provider():
+    """Fail loud if the shell's provider env is stale or unreachable.
+
+    Detects the three failure modes seen this session:
+      - AGI_PROVIDER unset (falls back to echo)
+      - AGI_API_KEY missing for a cloud provider
+      - llama-server not listening on the local port
+    """
+    prov = os.environ.get("AGI_PROVIDER", "").strip()
+    if not prov or prov == "echo":
+        print(f"FATAL: AGI_PROVIDER is '{prov or '<unset>'}' — run would use echo stub.",
+              file=sys.stderr)
+        print("       Set AGI_PROVIDER (groq / huggingface / nvidia / local) first.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    if prov in ("groq", "huggingface", "nvidia", "openai_compat"):
+        key = os.environ.get("AGI_API_KEY", "")
+        if not key:
+            print(f"FATAL: AGI_API_KEY empty for provider '{prov}'.", file=sys.stderr)
+            sys.exit(1)
+        if prov == "groq" and not key.startswith("gsk_"):
+            print(f"FATAL: groq key must start gsk_, got '{key[:6]}...'", file=sys.stderr)
+            sys.exit(1)
+        if prov == "huggingface" and not key.startswith("hf_"):
+            print(f"FATAL: huggingface key must start hf_, got '{key[:6]}...'", file=sys.stderr)
+            sys.exit(1)
+        if prov == "nvidia" and not key.startswith("nvapi-"):
+            print(f"FATAL: nvidia key must start nvapi-, got '{key[:6]}...'", file=sys.stderr)
+            sys.exit(1)
+
+    if prov in ("local", "ollama"):
+        base = os.environ.get("AGI_BASE_URL", "")
+        if not base:
+            print(f"FATAL: AGI_BASE_URL unset for provider '{prov}'.", file=sys.stderr)
+            sys.exit(1)
+        import urllib.request
+        try:
+            urllib.request.urlopen(base.rstrip("/") + "/models", timeout=5)
+        except Exception as e:
+            print(f"FATAL: provider '{prov}' unreachable at {base}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    # Final smoke: real chat call, reject echo-canned output.
+    import subprocess
+    try:
+        r = subprocess.run(
+            [sys.executable, "-m", "agi", "chat", "hi"],
+            cwd=ROOT, capture_output=True, text=True, timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        print("FATAL: agi chat timed out (60s) — provider likely dead.", file=sys.stderr)
+        sys.exit(1)
+    out = (r.stdout or "") + (r.stderr or "")
+    if r.returncode != 0:
+        print(f"FATAL: agi chat exited {r.returncode}:", file=sys.stderr)
+        print(out[:400], file=sys.stderr)
+        sys.exit(1)
+    if "How can I assist you today" in out and "echo" in out.lower():
+        print("FATAL: provider is echo stub — env is stale.", file=sys.stderr)
+        sys.exit(1)
+
 def main():
+    _check_provider()
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", default="all",
                     choices=["transfer", "composition", "contamination", "all"])
