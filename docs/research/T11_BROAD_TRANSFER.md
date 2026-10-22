@@ -201,3 +201,44 @@ were missing on revisions, those would fail schema).
 
 **Next measurement required:** 20-item revision run at 120b to distinguish
 from greedy baseline. Blocked on Groq daily quota reset (05:30 IST).
+
+### T13 20-item 120b — direct same-day comparison (2026-10-22)
+
+Both arms, same model, same bench, same quota window, ~3 min apart:
+
+- greedy: 14/20 = 0.70
+- revision-basic: 16/20 = 0.80
+- delta: **+0.10 in favor of revision**
+
+95% CI: greedy [0.52, 0.88], revision [0.64, 0.96]. Intervals
+overlap; the point estimate favors revision but n=20 single-run
+per arm is not enough for a confident claim.
+
+**Consistent with the T11 doc's +0.09 claim** (from 5-vs-6 sample
+multi-run). The direct same-day comparison supports the direction
+of the T13 effect, not just the direction stated in the doc.
+
+### Finding: T11 greedy baseline does not reproduce
+
+T11 doc baseline: 5-tool greedy on error_recovery = 17/20 = 0.85.
+Same bench, same model (openai/gpt-oss-120b via Groq), same day as
+the revision run: 14/20 = 0.70. Delta from stored baseline: -0.15,
+outside the 0.15 noise band.
+
+Either the model drifted since the baseline was measured, the
+stored baseline was a high sample, or conditions (quota, system
+load) affect performance materially. Any of these invalidates
+0.85 as a canonical reference. The 17/20 number should not be
+quoted without a same-day greedy control alongside.
+
+### Revision-specific failure modes (16/20 arm, 4 failures)
+
+- er-01: revision used `fs_glob` (extra.py only, AGI_TOOLS_EXTENDED off)
+- er-07: revision used `shell` twice (AGI_SHELL_ENABLED=false)
+- er-02, er-04: initial `fs_read` failed, no recovery fired
+
+Two of the four failures are revision-specific: 120b reaches for
+tools outside the active catalog during revision. Typechecker
+rejects, item falls back to original plan. Cost: extra calls,
+no benefit. Even so, revision's net delta vs same-day greedy is
+positive (+2 items rescued).
