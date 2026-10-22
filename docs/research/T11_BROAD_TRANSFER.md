@@ -174,3 +174,30 @@ After fixing `title` and `args` enumeration in t13_revision.py:
 Infrastructure verified correct: `registry.describe()` exposes `args_schema` (line 33), every tool class declares `args_model` (fs.py:29, 59, 108), `Planner` renders `- path: str *required*` into the prompt (planner.py:49-61).
 
 `bin/agi plan "read config.txt..."` produces correct args on a single call. Eval runs produce `args: {}` intermittently on 5-item batches. Conclusion: the 3B is below the reliability threshold for consistent arg production under eval load. Two prompt bugs fixed; capability remains the wall.
+
+### 120b revision cross-check (2026-10-22)
+
+Two 5-item `error_recovery` runs on `openai/gpt-oss-120b` via Groq with
+`--strategy revision --revision-signal basic`, after the `title` and `args`
+prompt fixes in `t13_revision.py`:
+
+- hf_test: 3/5 = 0.60
+- t13_check: 4/5 = 0.80
+
+Combined 7/10 = 0.70, 95% CI roughly [0.40, 0.90]. The T11 5-tool greedy
+baseline is 0.85 (17/20). **Within the confidence interval — cannot claim
+revision improves or degrades at 120b from two 5-item samples.**
+
+Revision fires on 120b (confirmed: `revision plan invalid` line in t13_check
+log). One failure mode: model picks tool `shell` on a revision attempt.
+`shell` is in `TOOL_SIGNATURES` but disabled by `AGI_SHELL_ENABLED=false` in
+the current config. 120b knows the tool name from training priors and reaches
+for it despite the catalog not including it. This is a distinct failure mode
+from the 3B's escape-into-inspection behavior — 120b's revision actively
+introduces a wrong tool rather than escaping to a cheap inspection tool.
+
+**Prompt fixes verified necessary at 120b** (4/5 items passed; if title/args
+were missing on revisions, those would fail schema).
+
+**Next measurement required:** 20-item revision run at 120b to distinguish
+from greedy baseline. Blocked on Groq daily quota reset (05:30 IST).
