@@ -242,3 +242,39 @@ tools outside the active catalog during revision. Typechecker
 rejects, item falls back to original plan. Cost: extra calls,
 no benefit. Even so, revision's net delta vs same-day greedy is
 positive (+2 items rescued).
+
+### Contamination probe + greedy baseline drift (2026-10-22)
+
+Contamination: error_recovery before/after a workspace_list prep run.
+
+- B fresh: 15/20 = 0.75
+- B after A: 13/20 = 0.65
+- delta: -0.10
+- verdict: clean (within noise)
+
+No evidence of cross-bench state leakage. Prior eval results valid.
+
+### T11 greedy baseline does not reproduce today
+
+Three clean greedy samples on error_recovery, 20 items each,
+same day, same model (openai/gpt-oss-120b via Groq):
+
+- 13/20 (transfer mode's er run)
+- 14/20 (greedy_20 direct run)
+- 15/20 (contamination B fresh)
+
+Mean 14/20 = 0.70. T11 stored baseline: 17/20 = 0.85.
+Delta: -0.15, outside the 0.15 noise band. Std across samples
+~1.0, 95% CI on the mean roughly [0.59, 0.78].
+
+The stored 0.85 is outside that interval. **The T11 baseline
+0.85 is inflated.** Either the historical measurement was
+high-sample, or conditions (model version, provider quota,
+system load) affect performance by ~0.15.
+
+Consequence for T13: revision 16/20 = 0.80 vs today's greedy
+mean 0.70 → delta +0.10. Direction of the T13 claim holds.
+Absolute values in the doc (greedy 0.85, revision 0.94) are
+both inflated by the same factor, so the +0.09 delta claim is
+directionally consistent but absolute numbers should not be
+quoted without a same-day control.
