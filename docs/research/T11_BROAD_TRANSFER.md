@@ -162,3 +162,15 @@ Item 2 (er-02) produced `[fs_read, fs_list, fs_list, fs_read, fs_write, fs_read]
 **Conclusion:** T13 is capability-gated. At 3B tier, revision cannot rescue the recovery failure because the model cannot produce schema-valid revision plans. Revision helps only when the base model is already capable of the task — it accelerates improvement, it does not create capability.
 
 **Infrastructure finding:** default provider timeout is 60s x 3 attempts = 180s. Any on-device model below ~10 tok/s times out 100% of planner calls. Raise via `AGI_PROVIDER_TIMEOUT_S=600`. Verified: 0 timeouts at 600s across 10 planner calls (greedy + revision, 5 items each).
+
+### Revision prompt postmortem (b3)
+
+After fixing `title` and `args` enumeration in t13_revision.py:
+
+- `title` schema rejections: 3 -> 1 (variance, not regression)
+- `args` empty `{}` failures: still present on er-01, er-03
+- Pass rate: 0/5 unchanged
+
+Infrastructure verified correct: `registry.describe()` exposes `args_schema` (line 33), every tool class declares `args_model` (fs.py:29, 59, 108), `Planner` renders `- path: str *required*` into the prompt (planner.py:49-61).
+
+`bin/agi plan "read config.txt..."` produces correct args on a single call. Eval runs produce `args: {}` intermittently on 5-item batches. Conclusion: the 3B is below the reliability threshold for consistent arg production under eval load. Two prompt bugs fixed; capability remains the wall.
