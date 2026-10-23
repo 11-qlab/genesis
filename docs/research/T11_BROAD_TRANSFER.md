@@ -278,3 +278,38 @@ Absolute values in the doc (greedy 0.85, revision 0.94) are
 both inflated by the same factor, so the +0.09 delta claim is
 directionally consistent but absolute numbers should not be
 quoted without a same-day control.
+
+### T13 tier comparison (2026-10-23)
+
+Three tiers, error_recovery, composition mode.
+
+| tier | provider | greedy | rev-basic | rev-rich |
+|---|---|---|---|---|
+| 3b | phone llama.cpp | 0/5 | 0/5 | not run |
+| 20b | Colab T4 gpt-oss-20b | 3/5=0.60 | 3/5=0.60 | 3/5=0.60 |
+| 120b | Groq gpt-oss-120b | 14/20=0.70 | 16/20=0.80 | not run |
+
+**20b delta: 0.000.** No effect from revision at 20b tier.
+120b delta: +0.10.
+
+**Interpretation.** Two readings:
+
+1. T13 mechanism requires ≥120b tier. Greedy scales gently
+   (0.00 -> 0.60 -> 0.70), but revision only adds value at 120b.
+   Below that, the critique pass produces plans that typecheck
+   but don't improve recovery outcomes.
+
+2. n=5 at 20b is too weak to distinguish +0.00 from +0.10.
+   Only 120b (n=20) has enough items to resolve the delta.
+
+Both readings support the same conclusion: the 20b tier adds
+no evidence for T13 and does not contradict it. Any writeup
+should present it as the honest middle, not as a confirmation
+or refutation.
+
+**Infrastructure note.** 20b on T4 (llama.cpp, 52 tok/s):
+planner prompts run ~600 tokens typical, ~6870 worst case.
+The 6870-token runaway calls occur roughly once per ~5 items
+and cost ~130s each. At n=20 per arm, one or two runaways per
+arm can push a 20-item bench past a 900s client timeout.
+Recommended floor for 20b tier: 1800s per arm.
