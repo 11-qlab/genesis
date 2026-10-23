@@ -29,6 +29,12 @@ def build_registry(
         from .extra import build_extra_tools
         for extra in build_extra_tools(fs_root):
             registry.register(extra)
+
+    # --- family tools (12-family distribution test) ---
+    import os as _os
+    if _os.environ.get('AGI_TOOLS_FAMILIES') == '1':
+        from . import family_tools as _family_tools
+        _family_tools.register_all(registry, fs_root)
     return registry
 
 

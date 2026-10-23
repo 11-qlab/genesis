@@ -1,0 +1,126 @@
+{
+  "frozen_at": "2026-10-23T07:33:06Z",
+  "files": [
+    {
+      "path": "bench/families/seed/fam01.jsonl",
+      "sha256": "1980370b8843eda5dddf4e02c4d4e8999bf997b04d6a15ad8caf39df751bc1ed",
+      "size": 1457
+    },
+    {
+      "path": "bench/families/seed/fam02.jsonl",
+      "sha256": "82762768423f3ae120105488735fc69ce42aa80e9a4c74a9e3be4a6440af72c6",
+      "size": 1120
+    },
+    {
+      "path": "bench/families/seed/fam03.jsonl",
+      "sha256": "173e5eff40cdd6c9e15493448b8447f282b38cfb150a8ef10e4f93638097566b",
+      "size": 1095
+    },
+    {
+      "path": "bench/families/seed/fam04.jsonl",
+      "sha256": "d7226bfd3f11f634544f498fe4c5fbf09b3445b4fd3f44ac8ab77b9fd8a258c2",
+      "size": 1270
+    },
+    {
+      "path": "bench/families/seed/fam05.jsonl",
+      "sha256": "28830e3210b8d14e7b3239368f9ec1269dc09e14a2b7ae71c5b0ab26614b7705",
+      "size": 1130
+    },
+    {
+      "path": "bench/families/seed/fam06.jsonl",
+      "sha256": "249692a8939a3a7e94496b32e6a0f4e349a599839b9368a4b8a2ea468800f464",
+      "size": 1110
+    },
+    {
+      "path": "bench/families/seed/fam07.jsonl",
+      "sha256": "9330e2a26872fdba5340aa655b80fcf567b51693e1766a1823e90828ca40376c",
+      "size": 1200
+    },
+    {
+      "path": "bench/families/seed/fam08.jsonl",
+      "sha256": "9e71f1bc4c196ef7136f3b438d6cec0d67cb7d9b780664c84c128767a417cc02",
+      "size": 1100
+    },
+    {
+      "path": "bench/families/seed/fam09.jsonl",
+      "sha256": "79708e5d71a9814867e53a19cff497dd34d6ebf85dcd9f424e63be04c1f61470",
+      "size": 1150
+    },
+    {
+      "path": "bench/families/seed/fam10.jsonl",
+      "sha256": "eae90c3f70bdf5036e82d0bc82db216cc999957a5c480853b89f157d2c2a9340",
+      "size": 1135
+    },
+    {
+      "path": "bench/families/seed/fam11.jsonl",
+      "sha256": "9ece451c395cc9c4f1f091b6c373650f7cca0f48eb8c7a5d59a27885b09f0e9d",
+      "size": 1005
+    },
+    {
+      "path": "bench/families/seed/fam12.jsonl",
+      "sha256": "5a0380cfced6e21b6b75c53e97d5d2d63d2e700705f0a28064f80a70fa74178d",
+      "size": 1465
+    },
+    {
+      "path": "bench/families/test/fam01.jsonl",
+      "sha256": "6b6d01f4eb194a3ce6b75e56fa4a0101ce15b6c15a9ec002409f13f4d26b08e3",
+      "size": 3923
+    },
+    {
+      "path": "bench/families/test/fam02.jsonl",
+      "sha256": "b52e9bf0562c7c2a0c1da874eaf31777306680b99d5f11333f278b26a5a0e1b4",
+      "size": 3604
+    },
+    {
+      "path": "bench/families/test/fam03.jsonl",
+      "sha256": "30f07dafc1a80c22871dc8e447fb586987e4220bfb58793244329e0a48a85eb2",
+      "size": 3060
+    },
+    {
+      "path": "bench/families/test/fam04.jsonl",
+      "sha256": "8a81bf407f55dc3b5a17ff127699d548ef4db4b96e5c532bb916c2d261dd92c2",
+      "size": 3868
+    },
+    {
+      "path": "bench/families/test/fam05.jsonl",
+      "sha256": "ed8ec529da4ef41330f4c989b04ca446727ab7c1ffc14e35760c327fde36a3ba",
+      "size": 3237
+    },
+    {
+      "path": "bench/families/test/fam06.jsonl",
+      "sha256": "38aaa2de2f504b6e22c469241867762a6a1b9c2ef009d4b4267abf759deb1307",
+      "size": 3452
+    },
+    {
+      "path": "bench/families/test/fam07.jsonl",
+      "sha256": "fe9526d16ee3c524913aa455c0b0a6e0edc61cd51794f6422922f3c80ff842af",
+      "size": 3391
+    },
+    {
+      "path": "bench/families/test/fam08.jsonl",
+      "sha256": "352b9cc1255690ff980e45e0e6349498ea91ed177b14e1dee3ecc3777f7e8798",
+      "size": 3222
+    },
+    {
+      "path": "bench/families/test/fam09.jsonl",
+      "sha256": "0b1ab2cc635db075398403cd1579a25547fc3d2d1e1f68a0660f455ae36c7759",
+      "size": 2819
+    },
+    {
+      "path": "bench/families/test/fam10.jsonl",
+      "sha256": "f38c558453557fa4cfef3b6a6f1479c281f9c0caef14d9748077834b088af5a0",
+      "size": 3069
+    },
+    {
+      "path": "bench/families/test/fam11.jsonl",
+      "sha256": "984f944fc9a0fa6828510927129609b9297851a12df4d4a77d29688dc363b171",
+      "size": 2726
+    },
+    {
+      "path": "bench/families/test/fam12.jsonl",
+      "sha256": "82f73c4ff761aec297c0b447e969ceb3623f7c04202b5aa80b0e784f3dc17864",
+      "size": 3666
+    }
+  ],
+  "manifest_sha256": "5fbbe902812d5da6a74f7724ae4fb6e2cdda194434caa97a5b0aa5e1707cd6ac"
+}

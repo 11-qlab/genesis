@@ -1,0 +1,5 @@
+{"id": "fam11-s01", "goal": "run sqlite_query on 'db0.sqlite3' with 'SELECT 1 AS x'. Write the result to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["sqlite_query", "fs_write"]}
+{"id": "fam11-s02", "goal": "run sqlite_query on 'db1.sqlite3' with 'SELECT 1 AS x'. Write the result to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["sqlite_query", "fs_write"]}
+{"id": "fam11-s03", "goal": "run sqlite_query on 'db2.sqlite3' with 'SELECT 1 AS x'. Write the result to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["sqlite_query", "fs_write"]}
+{"id": "fam11-s04", "goal": "run sqlite_query on 'db3.sqlite3' with 'SELECT 1 AS x'. Write the result to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["sqlite_query", "fs_write"]}
+{"id": "fam11-s05", "goal": "run sqlite_query on 'db4.sqlite3' with 'SELECT 1 AS x'. Write the result to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["sqlite_query", "fs_write"]}

@@ -1,0 +1,5 @@
+{"id": "fam5-s01", "goal": "write in0.txt='a,b,c'. Read it, write out0.txt with each token on its own line. Read out0 back.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write", "fs_read"]}
+{"id": "fam5-s02", "goal": "write in1.txt='a,b,c'. Read it, write out1.txt with each token on its own line. Read out1 back.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write", "fs_read"]}
+{"id": "fam5-s03", "goal": "write in2.txt='a,b,c'. Read it, write out2.txt with each token on its own line. Read out2 back.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write", "fs_read"]}
+{"id": "fam5-s04", "goal": "write in3.txt='a,b,c'. Read it, write out3.txt with each token on its own line. Read out3 back.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write", "fs_read"]}
+{"id": "fam5-s05", "goal": "write in4.txt='a,b,c'. Read it, write out4.txt with each token on its own line. Read out4 back.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write", "fs_read"]}
