@@ -1,0 +1,36 @@
+{
+  "families": [
+    "fam05",
+    "fam07",
+    "fam08",
+    "fam09"
+  ],
+  "runs_per_family": 1,
+  "n_observations": 48,
+  "entropy_total": 0.9798687566511528,
+  "entropy_conditional": 0.9591479170272448,
+  "mutual_information": 0.020720839623908027,
+  "verdict": "scattered \u2014 possible general mechanism",
+  "per_family": {
+    "fam05": {
+      "n": 12,
+      "passes": 6,
+      "accuracy": 0.5
+    },
+    "fam07": {
+      "n": 12,
+      "passes": 4,
+      "accuracy": 0.3333333333333333
+    },
+    "fam08": {
+      "n": 12,
+      "passes": 4,
+      "accuracy": 0.3333333333333333
+    },
+    "fam09": {
+      "n": 12,
+      "passes": 6,
+      "accuracy": 0.5
+    }
+  }
+}
