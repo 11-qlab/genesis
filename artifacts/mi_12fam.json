@@ -1,0 +1,84 @@
+{
+  "families": [
+    "fam01",
+    "fam02",
+    "fam03",
+    "fam04",
+    "fam05",
+    "fam06",
+    "fam07",
+    "fam08",
+    "fam09",
+    "fam10",
+    "fam11",
+    "fam12"
+  ],
+  "runs_per_family": 1,
+  "n_observations": 144,
+  "entropy_total": 0.616748259826391,
+  "entropy_conditional": 0.42149258130591943,
+  "mutual_information": 0.1952556785204716,
+  "verdict": "moderately clustered \u2014 mixed",
+  "per_family": {
+    "fam01": {
+      "n": 12,
+      "passes": 0,
+      "accuracy": 0.0
+    },
+    "fam02": {
+      "n": 12,
+      "passes": 1,
+      "accuracy": 0.08333333333333333
+    },
+    "fam03": {
+      "n": 12,
+      "passes": 0,
+      "accuracy": 0.0
+    },
+    "fam04": {
+      "n": 12,
+      "passes": 0,
+      "accuracy": 0.0
+    },
+    "fam05": {
+      "n": 12,
+      "passes": 4,
+      "accuracy": 0.3333333333333333
+    },
+    "fam06": {
+      "n": 12,
+      "passes": 0,
+      "accuracy": 0.0
+    },
+    "fam07": {
+      "n": 12,
+      "passes": 5,
+      "accuracy": 0.4166666666666667
+    },
+    "fam08": {
+      "n": 12,
+      "passes": 4,
+      "accuracy": 0.3333333333333333
+    },
+    "fam09": {
+      "n": 12,
+      "passes": 6,
+      "accuracy": 0.5
+    },
+    "fam10": {
+      "n": 12,
+      "passes": 1,
+      "accuracy": 0.08333333333333333
+    },
+    "fam11": {
+      "n": 12,
+      "passes": 0,
+      "accuracy": 0.0
+    },
+    "fam12": {
+      "n": 12,
+      "passes": 1,
+      "accuracy": 0.08333333333333333
+    }
+  }
+}

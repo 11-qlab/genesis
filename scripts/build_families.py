@@ -30,10 +30,14 @@ def _w(path: str, content: str) -> dict:
 
 
 def seed_set(items):
+    for it in items:
+        it.setdefault("expect_tool", None)
     return items
 
 
 def test_set(items):
+    for it in items:
+        it.setdefault("expect_tool", None)
     return items
 
 
