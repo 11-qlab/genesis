@@ -1,0 +1,28 @@
+{
+  "bench": "/tmp/er_5.jsonl",
+  "seed_file": "/tmp/er_self_seed.jsonl",
+  "results": {
+    "0": {
+      "passed": 2,
+      "total": 5,
+      "accuracy": 0.4
+    },
+    "1": {
+      "passed": 1,
+      "total": 5,
+      "accuracy": 0.2
+    },
+    "3": {
+      "passed": 1,
+      "total": 5,
+      "accuracy": 0.2
+    },
+    "5": {
+      "passed": 2,
+      "total": 5,
+      "accuracy": 0.4
+    }
+  },
+  "slope": 0.02601136664551528,
+  "verdict": "narrow: <0.05, needs many examples"
+}
