@@ -20,3 +20,4 @@ experiments/*
 !experiments/.gitkeep
 !checkpoints/.gitkeep
 .agi_env
+!artifacts/*.json
