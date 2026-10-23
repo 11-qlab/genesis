@@ -59,7 +59,21 @@ def run_one(bench: Path, tag: str, delay_ms: int = 1500) -> dict | None:
         shutil.rmtree(ws, ignore_errors=True)
 
 
+
+
+def _check_provider():
+    prov = os.environ.get("AGI_PROVIDER", "").strip()
+    if not prov or prov == "echo":
+        sys.exit(f"FATAL: AGI_PROVIDER is {prov!r}")
+    if not os.environ.get("AGI_API_KEY", ""):
+        sys.exit(f"FATAL: AGI_API_KEY empty for {prov}")
+    r = subprocess.run([sys.executable, "-m", "agi", "chat", "hi"],
+                       cwd=ROOT, capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        sys.exit(f"FATAL: agi chat failed — {r.stderr[:300]}")
+
 def main():
+    _check_provider()
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--out", required=True)
