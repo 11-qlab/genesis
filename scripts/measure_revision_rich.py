@@ -77,7 +77,7 @@ def main() -> int:
         a_ = d.get("accuracy")
         acc_str = f"{a_:.4f}" if isinstance(a_, (int, float)) else "?"
         print(
-            f"{label:<24} {str(p_):>6} {str(t_):>6} {acc_str:>9}"
+            f"{label:<24} {p_!s:>6} {t_!s:>6} {acc_str:>9}"
         )
     return 0
 

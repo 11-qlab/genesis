@@ -23,8 +23,8 @@ from agi.core import load_config  # noqa: E402
 from agi.evaluation.dataset import load_dataset  # noqa: E402
 from agi.providers.router import build_provider  # noqa: E402
 from agi.reasoning.planner import Planner  # noqa: E402
-from agi.trajectories import CalibrationProbe  # noqa: E402
 from agi.tools import build_registry  # noqa: E402
+from agi.trajectories import CalibrationProbe  # noqa: E402
 
 
 def main() -> int:
@@ -56,7 +56,7 @@ def main() -> int:
         raw = (probe.last_raw_text or "").replace("\n", " ")[:58] or "(empty)"
         ok = probe.last_parsed_ok
         rows.append((item.id, est, ok))
-        print(f"{item.id:12s} {est:>4d} {str(ok):>4s}  {raw!r}")
+        print(f"{item.id:12s} {est:>4d} {ok!s:>4s}  {raw!r}")
         time.sleep(0.3)
 
     print()

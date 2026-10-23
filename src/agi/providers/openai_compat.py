@@ -13,6 +13,10 @@ from collections.abc import Iterator
 from ..core.errors import ProviderError
 from .base import Completion, Message, Usage
 
+# Cap planner output. Prevents runaway reasoning (6870-token
+# responses at 52 tok/s = 132s, exceeding the client timeout).
+MAX_TOKENS_DEFAULT = 800
+
 # Cloudflare (used by Groq and others) blocks default Python UAs.
 _USER_AGENT = "agi-platform/0.1 (+https://github.com/)"
 
@@ -163,7 +167,7 @@ class OpenAICompatProvider:
         self,
         messages: list[Message],
         *,
-        max_tokens: int | None = None,
+        max_tokens: int | None = MAX_TOKENS_DEFAULT,
         temperature: float | None = None,
     ) -> Completion:
         body = self._payload(
@@ -209,7 +213,7 @@ class OpenAICompatProvider:
         self,
         messages: list[Message],
         *,
-        max_tokens: int | None = None,
+        max_tokens: int | None = MAX_TOKENS_DEFAULT,
         temperature: float | None = None,
     ) -> Iterator[str]:
         body = self._payload(

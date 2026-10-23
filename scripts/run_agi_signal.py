@@ -53,7 +53,7 @@ def run_bench(bench, strategy="greedy", signal=None, tag="", delay_ms=1500):
     try:
         p = subprocess.run(
             args, cwd=ROOT, env=env,
-            capture_output=True, text=True, timeout=3600,
+            capture_output=True, text=True, timeout=9000,
         )
         return json.loads(p.stdout)
     except Exception as e:
