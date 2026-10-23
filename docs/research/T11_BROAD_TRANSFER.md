@@ -313,3 +313,28 @@ The 6870-token runaway calls occur roughly once per ~5 items
 and cost ~130s each. At n=20 per arm, one or two runaways per
 arm can push a 20-item bench past a 900s client timeout.
 Recommended floor for 20b tier: 1800s per arm.
+
+### Distribution test: MI within alive band (2026-10-24)
+
+The 12-family distribution test measured I(family; pass) = 0.195 bits
+on gpt-oss-20b. That number is inflated by 5 families that scored 0.00
+across all 12 items (fam01, fam03, fam04, fam06, fam11). Within-family
+entropy for those is 0, dragging H(pass|family) down.
+
+Constraining to the 4 "alive" families (fam05=0.33, fam07=0.33,
+fam08=0.25, fam09=0.58 in run A): I = 0.047 bits. Run B same four:
+I = 0.021 bits. Combined ~0.03.
+
+**Interpretation.** The 0.195 was measuring "bench has three tiers of
+difficulty." The 0.03 is measuring "within the alive band, failures
+don't cluster by family." The latter is the AGI-adjacent signal:
+failing randomly within a difficulty band is what a general mechanism
+would do; failing clustered by family would be a narrow agent.
+
+But: n=48 per run means the estimator noise exceeds the signal. fam05
+moving 2 items shifted MI by 0.026. Cannot distinguish 0.03 from 0.10
+without more samples per family.
+
+**Next measurement.** Same 4 families at 120b tier. If MI stays <0.1,
+scattered-within-alive is a stable property independent of capability.
+If MI rises to ~0.2, capability introduces structure where none existed.
