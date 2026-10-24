@@ -49,7 +49,7 @@ def run_one(bench: Path, tag: str, delay_ms: int = 1500) -> dict | None:
             "--strategy", "greedy", "--delay-ms", str(delay_ms)]
     try:
         p = subprocess.run(args, cwd=ROOT, env=env,
-                           capture_output=True, text=True, timeout=2400)
+                           capture_output=True, text=True, timeout=1200)
         return json.loads(p.stdout)
     except Exception as e:
         print(f"  [!] {tag}: {type(e).__name__}: {e}", file=sys.stderr)
