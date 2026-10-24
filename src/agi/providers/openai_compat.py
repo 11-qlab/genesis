@@ -15,7 +15,7 @@ from .base import Completion, Message, Usage
 
 # Cap planner output. Prevents runaway reasoning (6870-token
 # responses at 52 tok/s = 132s, exceeding the client timeout).
-MAX_TOKENS_DEFAULT = 800
+MAX_TOKENS_DEFAULT = 6144
 
 # Cloudflare (used by Groq and others) blocks default Python UAs.
 _USER_AGENT = "agi-platform/0.1 (+https://github.com/)"
@@ -38,7 +38,7 @@ class OpenAICompatProvider:
         base_url: str,
         model: str,
         api_key_env: str = "AGI_API_KEY",
-        timeout_s: float = 60.0,
+        timeout_s: float = 240.0,
         max_retries: int = 2,
     ) -> None:
         self.name = name
@@ -163,12 +163,12 @@ class OpenAICompatProvider:
 
     # --- public API --------------------------------------------------
 
-    def complete(
+    def _complete_once(
         self,
         messages: list[Message],
         *,
-        max_tokens: int | None = MAX_TOKENS_DEFAULT,
-        temperature: float | None = None,
+        max_tokens: int | None,
+        temperature: float | None,
     ) -> Completion:
         body = self._payload(
             messages,
@@ -187,8 +187,6 @@ class OpenAICompatProvider:
             choice = data["choices"][0]
             message = choice["message"]
             content = message.get("content") or ""
-            # Reasoning models put intermediate text in reasoning_content and
-            # leave content empty until the answer is ready.
             if not content:
                 content = (
                     message.get("reasoning_content")
@@ -208,6 +206,43 @@ class OpenAICompatProvider:
             finish_reason=choice.get("finish_reason"),
             raw=data,
         )
+
+    def complete(
+        self,
+        messages: list[Message],
+        *,
+        max_tokens: int | None = MAX_TOKENS_DEFAULT,
+        temperature: float | None = None,
+    ) -> Completion:
+        completion = self._complete_once(
+            messages, max_tokens=max_tokens, temperature=temperature,
+        )
+        # Detect reasoning-starvation: model burned the whole budget on CoT
+        # and never emitted structured output. Retry with a hard nudge.
+        if (
+            completion.finish_reason == "length"
+            and "{" not in completion.text
+            and len(messages) < 100
+        ):
+            nudge = Message(
+                role="system",
+                content=(
+                    "STOP. Your prior response used the entire output budget "
+                    "on reasoning without producing output. Now respond with "
+                    "ONLY the required JSON object. No prose. No reasoning. "
+                    "Just the JSON."
+                ),
+            )
+            retried = self._complete_once(
+                messages + [nudge],
+                max_tokens=max_tokens,
+                temperature=0.0,
+            )
+            if "{" in retried.text or retried.finish_reason != "length":
+                return retried
+            # Both attempts starved — return the retry so caller sees the error
+            return retried
+        return completion
 
     def stream(
         self,
