@@ -6,6 +6,7 @@ coordinator invoked against the dataset item's expectations.
 """
 
 from __future__ import annotations
+import os
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -95,6 +96,54 @@ def _contains_subsequence(seq: list, sub: list) -> bool:
     return all(any(x == wanted for x in it) for wanted in sub)
 
 
+def _extract_seed_files(path: Path) -> dict[str, list[dict]]:
+    """Read raw JSONL, extract seed_files entries per item id."""
+    import json as _json
+    seed_map: dict[str, list[dict]] = {}
+    if not path.exists():
+        return seed_map
+    for line in path.read_text().splitlines():
+        if not line.strip():
+            continue
+        try:
+            raw = _json.loads(line)
+        except Exception:
+            continue
+        item_id = raw.get("id")
+        seed_files = raw.get("seed_files")
+        if item_id and seed_files:
+            seed_map[item_id] = seed_files
+    return seed_map
+
+
+def _make_seed_hook(seed_map: dict[str, list[dict]]):
+    """Return a before_each hook that writes seed_files under AGI_FS_ROOT."""
+    from pathlib import Path as _P
+
+    def _seed(item) -> None:
+        item_id = getattr(item, "id", None)
+        if not item_id:
+            return
+        seed_files = seed_map.get(item_id)
+        if not seed_files:
+            return
+        root = _P(os.environ.get("AGI_FS_ROOT", "state/workspace")).resolve()
+        root.mkdir(parents=True, exist_ok=True)
+        for sf in seed_files:
+            rel = sf.get("path")
+            if not rel or rel.startswith("/") or ".." in rel.split("/"):
+                continue
+            target = (root / rel).resolve()
+            try:
+                target.relative_to(root)
+            except ValueError:
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(sf.get("content", ""))
+
+    return _seed
+
+
 @dataclass(frozen=True)
 class Benchmark:
     """A dataset + a pass/fail rule.
@@ -113,8 +162,34 @@ class Benchmark:
 
     @classmethod
     def from_file(cls, path: str | Path, *, name: str | None = None) -> Benchmark:
-        ds = load_dataset(path)
-        return cls(name=name or ds.name, dataset=ds)
+        path = Path(path)
+        seed_map = _extract_seed_files(path)
+        try:
+            ds = load_dataset(path)
+        except Exception:
+            import json as _json
+            import tempfile
+            stripped = []
+            for line in path.read_text().splitlines():
+                if not line.strip():
+                    continue
+                raw = _json.loads(line)
+                raw.pop("seed_files", None)
+                stripped.append(_json.dumps(raw))
+            tmp = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".jsonl", delete=False, dir=str(path.parent)
+            )
+            tmp.write("\n".join(stripped) + "\n")
+            tmp.close()
+            try:
+                ds = load_dataset(tmp.name)
+            finally:
+                try:
+                    os.remove(tmp.name)
+                except OSError:
+                    pass
+        before_each = _make_seed_hook(seed_map) if seed_map else None
+        return cls(name=name or ds.name, dataset=ds, before_each=before_each)
 
 
 def first_tool_from_result(result: dict[str, Any]) -> str | None:
