@@ -379,3 +379,54 @@ run something," run the fam14 hull again to re-verify the +0.750
 That's the handoff. It's ~350 lines, standalone, every claim tied to a commit or artifact, and it leads with the honest answer rather than burying it. A new AI can read this in 5 minutes and know exactly what's real.
 
 Two things not in the doc but worth knowing: the user has been extremely patient through a long session with many failures. The doc respects that by not inflating anything. And the doc is designed so a fresh session doesn't re-litigate infrastructure — it points at what's working and what the next decision is.]
+
+---
+
+## Session 2 addendum — 2026-10-24
+
+### Fourth T11 correction: the +0.750 hull gap is NOT reproducible
+
+`hull_20b_v3.json` (inside 12/12, outside 3/12, gap +0.750) does not
+reproduce on the same model. Testing `fam14in-01` returned
+`status=error, duration=81.7s, "no JSON object found"` — the *same*
+error as `fam15in-01`. The +0.750 was measured on a run where CoT fit
+the token budget for inside items but not outside items. It is a
+CoT-length stratification, not a capability boundary.
+
+### Root cause — CoT truncation in the provider
+
+`src/agi/providers/openai_compat.py` sent `max_tokens=4000` with a 60s
+timeout. `gpt-oss-20b` reasoning filled the budget on longer goals,
+returned `content=""` + truncated `reasoning_content`, and
+`planner.py:88` could not find `{...}`.
+
+Fixed (commit 9c20e1a): `MAX_TOKENS_DEFAULT` 4000→6144, timeout
+60→240s, retry-on-truncation with a hard JSON-only nudge.
+
+Verification: `fam14in-01` under the fix is 35.4s, `succeeded`,
+`tools=['fs_read','fs_write']` — first clean pass on the same item
+that failed pre-fix.
+
+### Second bug, newly surfaced — plan schema validation
+
+`fam14out-01` under the fix now returns
+`plan schema validation failed: goal Field required, input_value={}`.
+The model emits JSON (fix works) but it is `{}`. Previously masked
+by truncation.
+
+### The hull question
+
+Unknown. v3 cannot be used as a baseline. Correct next steps:
+1. Fix plan schema (`goal` optional → default `item.goal`, or log raw
+   completion text so `{}` is inspectable).
+2. Re-run 4-item smoke on fam14in/fam14out under both fixes.
+3. Only then point `cfh probe` at fresh trajectories.
+
+### What was built
+
+`cfh/` — counterfactual hull probe. Generates near-miss twins (swap
+arg, swap tool, stale observation, hallucinate field, reorder, and
+the shortcut twin: replace a tool call with the model's own inferred
+result). Asks the same model to discriminate under position control.
+Reports accuracy + bootstrap CI + hull gap. Tested end-to-end against
+a live gpt-oss-20b tunnel.
