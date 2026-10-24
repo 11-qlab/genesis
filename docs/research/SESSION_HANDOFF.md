@@ -489,3 +489,91 @@ trajectories" — the inside/outside split may not be real.
 
 If fam14out hits the peg-native 500 in the 12-item run, the fix
 needs to go in llama.cpp's grammar config, not the Python side.
+
+### Session-2 end: no hull in fam14 OR fam15 — +0.750 fully retracted
+
+Complete evidence after all four fixes (CoT truncation, retry nudge {},
+seed_files schema, PlanStep.title):
+
+  fam14in-01:  12/12 v3 rerun + 4/4 smoke post-fix
+  fam14out:    7/7 fair-window items pass, correct tools
+  fam15in-01:  succeeded 211.2s, ['fs_list','fs_write']
+  fam15out-01: succeeded  47.7s, ['hash_check','fs_write']
+
+Both sides of both families are solvable by gpt-oss-20b. The +0.750
+hull gap on fam14 and the "shortcut policy again" (0/12) on fam15
+were both multi-bug harness artifacts, not capability boundaries.
+
+### Correction to commit 9998433 (Control A)
+
+Commit 9998433 is labelled "hull Control A - 0/12 both, shortcut
+policy again". This was wrong. The 0/12 on both fam15 sides was:
+  - fam15in:  "no JSON object found" at 81s (CoT truncation)
+  - fam15out: same, plus seed_error under --seed none
+Neither was shortcut behavior. The model never emitted a tool call
+that got scored — it never reached the coordinator. The commit's
+diagnosis was inferred from the aggregate score, not from the
+underlying error details, and every subsequent session built on
+that wrong premise.
+
+### Corrected understanding of "the hull"
+
+There is no hull in fam14 or fam15. The handoff's original
+"first defensible AGI-adjacent result" (+0.750) is retracted.
+What the project actually has is a working agentic platform, an
+eval harness that now handles reasoning-model output correctly,
+and no measured capability boundary on the tasks tested so far.
+
+### cfh/ probe — reframed
+
+cfh/ was built to test "can the model discriminate inside-hull
+from outside-hull trajectories". Since the hull does not exist,
+that framing is dead. The probe remains valid as a *generic*
+trajectory discrimination test: given a correct trajectory and a
+near-miss twin, can the model tell which is which? That question
+is independent of whether a hull exists, and it's the actual
+novel measurement in cfh/. The inside-prefix/outside-prefix flags
+still work but should be replaced with a family-agnostic split
+when the probe is next used.
+
+### Session-2 fix list (all committed)
+
+  9c20e1a  CoT truncation fix + cfh/ package
+  64705af  Handoff addendum
+  7030fcf  Benches + scripts + hull artifacts
+  70d8bb7  4/4 fam14in smoke
+  4e58469  benchmark.py seed_files hook (introduced the dict bug)
+  3f412ad  fam11 two-step chains
+  5c02701  distribution timeout fix
+  (this)   plan schema fixes (title, retry, nudge)
+  (this)   final: no hull fam14/fam15, Control A correction
+  42a9c55  seed_files schema fix (dict form)
+
+### Next session — first actions in order
+
+1. Stable tunnel or local llama.cpp. Two sessions of measurement
+   have been lost to Colab DNS instability. If local RAM allows
+   (>=16GB for gpt-oss-20b Q4), do that; else named Cloudflare
+   tunnel. This is the single highest-leverage infrastructure fix.
+
+2. Run cfh probe against real trajectories. The probe has never
+   consumed real data — it's only been tested on synthetic. Point
+   it at artifacts from a `--jsonl-out` run once the tunnel is
+   stable. Reframe from inside/outside to correct/twin.
+
+3. Do NOT re-attempt a hull measurement on fam14 or fam15. That
+   question is answered: no hull. Anything that looks like one is
+   another harness bug.
+
+4. fam14out-11 (631s, no JSON) in one run is genuine CoT variance.
+   If it recurs, investigate `reasoning_effort: "low"` support on
+   llama.cpp. Not priority — one sample.
+
+### Deployment note — final
+
+The tunnel stability problem is not fixable in Python. The
+`--resume` + `--jsonl-out` flags added to run_hull_boundary.py
+make intermittent tunnels workable, but multi-item runs without
+a stable tunnel will keep producing misleading aggregate scores
+(transport failures counted as capability failures). Prefer local
+llama.cpp above all else.
