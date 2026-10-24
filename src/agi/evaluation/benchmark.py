@@ -111,8 +111,18 @@ def _extract_seed_files(path: Path) -> dict[str, list[dict]]:
             continue
         item_id = raw.get("id")
         seed_files = raw.get("seed_files")
-        if item_id and seed_files:
+        if not (item_id and seed_files):
+            continue
+        # Bench files use {"path": "content"} dicts. The hook expects
+        # [{"path": ..., "content": ...}]. Normalize here so callers
+        # (including --seed none) get a consistent shape.
+        if isinstance(seed_files, dict):
+            seed_map[item_id] = [
+                {"path": k, "content": v} for k, v in seed_files.items()
+            ]
+        elif isinstance(seed_files, list):
             seed_map[item_id] = seed_files
+        # unknown shape -> skip silently
     return seed_map
 
 
@@ -127,6 +137,11 @@ def _make_seed_hook(seed_map: dict[str, list[dict]]):
         seed_files = seed_map.get(item_id)
         if not seed_files:
             return
+        # Defensive: accept dict form ({path: content}) as well
+        if isinstance(seed_files, dict):
+            seed_files = [
+                {"path": k, "content": v} for k, v in seed_files.items()
+            ]
         root = _P(os.environ.get("AGI_FS_ROOT", "state/workspace")).resolve()
         root.mkdir(parents=True, exist_ok=True)
         for sf in seed_files:
