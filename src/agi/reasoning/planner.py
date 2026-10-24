@@ -124,24 +124,75 @@ class Planner:
                 ),
             ),
         ]
-        completion = self.provider.complete(messages, temperature=temperature)
-        payload = extract_json_object(completion.text)
-        if (
-            isinstance(payload, dict)
-            and "steps" not in payload
-            and ("tool" in payload or "title" in payload)
-        ):
-            payload = {"goal": goal, "steps": [payload]}
-        # Wrap pydantic's ValidationError as PlanValidationError so callers
-        # only ever handle one exception type from plan(). The message keeps
-        # the field name so failure detail remains actionable.
-        try:
-            plan = Plan.model_validate(payload)
-        except Exception as exc:
-            raise PlanValidationError(
-                f"plan schema validation failed: {exc}"
-            ) from exc
-        problems = plan.validate_graph(set(self.tool_names))
-        if problems:
-            raise PlanValidationError("; ".join(problems))
-        return plan
+        SCHEMA_HINT = (
+            'You must respond with a JSON object of this exact shape, no prose:\n'
+            '{"goal": "<one-sentence summary of the goal>", '
+            '"steps": [{"id": "1", "tool": "<tool_name>", '
+            '"args": {"<arg>": "<value>"}, "depends_on": []}]}\n'
+            'The "steps" array MUST be non-empty. Do NOT output {} or any '
+            'object without a non-empty "steps" array.'
+        )
+
+        last_payload: object = None
+        last_raw: str = ""
+        for attempt in range(2):
+            attempt_messages = messages
+            if attempt == 1:
+                attempt_messages = messages + [
+                    Message(role="user", content=SCHEMA_HINT)
+                ]
+            completion = self.provider.complete(
+                attempt_messages,
+                temperature=temperature if attempt == 0 else 0.0,
+            )
+            last_raw = completion.text
+            try:
+                payload = extract_json_object(completion.text)
+            except PlanValidationError:
+                last_payload = None
+                continue
+            last_payload = payload
+
+            # Repair 1: single-step payload without "steps" wrapper
+            if (
+                isinstance(payload, dict)
+                and "steps" not in payload
+                and ("tool" in payload or "title" in payload)
+            ):
+                payload = {"goal": goal, "steps": [payload]}
+            # Repair 2: multi-step payload missing goal
+            elif (
+                isinstance(payload, dict)
+                and payload.get("steps")
+                and not payload.get("goal")
+            ):
+                payload = {**payload, "goal": goal}
+
+            # Repair 3: fill per-step "title" (required by PlanStep, never
+            # mentioned in the system prompt — model can't know to emit it).
+            # Title is cosmetic (used in traces), so auto-fill is safe.
+            if isinstance(payload, dict) and isinstance(payload.get("steps"), list):
+                for idx, step in enumerate(payload["steps"]):
+                    if isinstance(step, dict) and not step.get("title"):
+                        tool_name = step.get("tool") or "step"
+                        step["title"] = f"{tool_name} (step {idx + 1})"
+
+            # Detect empty / stub payload -> retry
+            if not isinstance(payload, dict) or not payload.get("steps"):
+                continue
+
+            try:
+                plan = Plan.model_validate(payload)
+            except Exception as exc:
+                raise PlanValidationError(
+                    f"plan schema validation failed: {exc} | raw={completion.text[:300]!r}"
+                ) from exc
+            problems = plan.validate_graph(set(self.tool_names))
+            if problems:
+                raise PlanValidationError("; ".join(problems))
+            return plan
+
+        raise PlanValidationError(
+            "model produced empty/stub plan after 2 attempts; "
+            f"last payload={last_payload!r} raw={last_raw[:300]!r}"
+        )

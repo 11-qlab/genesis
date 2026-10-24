@@ -228,9 +228,11 @@ class OpenAICompatProvider:
                 role="system",
                 content=(
                     "STOP. Your prior response used the entire output budget "
-                    "on reasoning without producing output. Now respond with "
-                    "ONLY the required JSON object. No prose. No reasoning. "
-                    "Just the JSON."
+                    "on reasoning without producing the final answer. Now "
+                    "respond with a COMPLETE JSON object that includes every "
+                    "field the original request specified. Do NOT output an "
+                    "empty object {} or a placeholder — output the actual "
+                    "data. No prose, no reasoning, just the complete JSON."
                 ),
             )
             retried = self._complete_once(
