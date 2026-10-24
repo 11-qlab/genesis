@@ -405,7 +405,8 @@ Fixed (commit 9c20e1a): `MAX_TOKENS_DEFAULT` 4000→6144, timeout
 
 Verification: `fam14in-01` under the fix is 35.4s, `succeeded`,
 `tools=['fs_read','fs_write']` — first clean pass on the same item
-that failed pre-fix.
+that failed pre-fix. **4-item fam14in smoke under the fix: 4/4 passed.**
+The fix is stable, not a lucky single sample.
 
 ### Second bug, newly surfaced — plan schema validation
 
