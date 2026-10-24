@@ -431,3 +431,15 @@ the shortcut twin: replace a tool call with the model's own inferred
 result). Asks the same model to discriminate under position control.
 Reports accuracy + bootstrap CI + hull gap. Tested end-to-end against
 a live gpt-oss-20b tunnel.
+
+### Third failure mode observed — server-side PEG grammar
+
+`client error 500: The model produced output that does not match the
+expected peg-native format` — llama.cpp's grammar validator rejecting
+tool-call output. Distinct from planner-level "no JSON object found"
+and schema-level "goal Field required". Likely related to fam14out's
+persistent failures: chained `text_regex` + `fs_write` may be harder
+to express under the grammar than fam14in's `fs_read` + `fs_write`.
+Investigate by dumping the model's raw output before grammar enforcement
+(server flag `--grammar` or `--grammar-file` may need loosening).
+
