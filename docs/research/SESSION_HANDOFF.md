@@ -443,3 +443,49 @@ to express under the grammar than fam14in's `fs_read` + `fs_write`.
 Investigate by dumping the model's raw output before grammar enforcement
 (server flag `--grammar` or `--grammar-file` may need loosening).
 
+
+### Session-2 final: +0.750 refuted, three bugs fixed, hull question reopens
+
+fam14out-01 now succeeds on the fixed harness (96.8s, tools=
+['text_regex','fs_write']). Combined with fam14in-01 (35.4s, 4/4
+smoke clean), both sides of the original hull measurement pass on
+the same model, same day.
+
+**The +0.750 gap was not a capability boundary.** It was three
+stacked harness bugs discovered in this session:
+  1. CoT truncation (max_tokens 4000, planner saw empty content)
+  2. Retry nudge produced {} (reasoning model read "just the JSON"
+     as minimal)
+  3. PlanStep.title required by pydantic but never mentioned to the
+     model
+
+All three are fixed. The hull question is genuinely open: a real
+effect may or may not exist, and the previous measurement cannot
+distinguish between "no hull" and "small hull masked by harness bugs."
+
+### Next session's first task — fresh 12+12 hull measurement
+
+On a clean tree with all fixes in place:
+  python scripts/run_hull_boundary.py --out artifacts/hull_fixed.json
+
+Expected outcomes:
+- Inside ≈ Outside (both high) → no hull, close the thread
+- Inside > Outside with clean runs → real hull, measure honestly
+- Both sides fail → different bug, diagnose from raw output
+
+Only after that measurement should cfh/ (the discrimination probe)
+be pointed at fresh trajectories. Its framing shifts from
+"inside vs outside capability" to "correct vs near-miss
+trajectories" — the inside/outside split may not be real.
+
+### Failure modes now documented (all three)
+
+| Error | Layer | Status |
+|---|---|---|
+| "no JSON object found" | planner.py:88 | fixed (CoT budget) |
+| "plan schema validation failed: {}" | planner retry | fixed (nudge) |
+| "plan schema validation failed: title Field required" | planner parse | fixed (auto-fill) |
+| "peg-native format" 500 | llama.cpp grammar | **unaddressed** — watch for it on fam14out at scale |
+
+If fam14out hits the peg-native 500 in the 12-item run, the fix
+needs to go in llama.cpp's grammar config, not the Python side.
