@@ -1,0 +1,15 @@
+{
+  "inside": {
+    "passed": 0,
+    "total": 12,
+    "acc": 0.0
+  },
+  "outside": {
+    "passed": 0,
+    "total": 12,
+    "acc": 0.0
+  },
+  "gap": 0.0,
+  "verdict": "NOT hull-bounded (or matched difficulty)",
+  "model": "gpt-oss-20b"
+}
