@@ -1,0 +1,136 @@
+{
+  "overall": {
+    "passed": 12,
+    "total": 12,
+    "acc": 1.0
+  },
+  "path_distribution": {
+    "path_A": 12,
+    "path_B": 0,
+    "no_write": 0,
+    "no_read": 0,
+    "write_no_read": 0,
+    "empty": 0
+  },
+  "pass_by_path": {
+    "path_A": 12,
+    "path_B": 0,
+    "no_write": 0,
+    "no_read": 0,
+    "write_no_read": 0,
+    "empty": 0
+  },
+  "invariant": false,
+  "verdict": "path-A-only (direct create)",
+  "model": "gpt-oss-20b",
+  "items": [
+    {
+      "id": "fam13-01",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-02",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-03",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-04",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-05",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-06",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-07",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-08",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-09",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-10",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-11",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    },
+    {
+      "id": "fam13-12",
+      "passed": true,
+      "path": "path_A",
+      "tool_sequence": [
+        "fs_write",
+        "fs_read"
+      ]
+    }
+  ]
+}

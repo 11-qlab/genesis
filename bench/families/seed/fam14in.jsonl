@@ -1,0 +1,5 @@
+{"id": "fam14in-s01", "goal": "write in0.txt='alpha0'. read in0.txt with fs_read. write its contents to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write"], "expect_tool": null}
+{"id": "fam14in-s02", "goal": "write in1.txt='alpha1'. read in1.txt with fs_read. write its contents to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write"], "expect_tool": null}
+{"id": "fam14in-s03", "goal": "write in2.txt='alpha2'. read in2.txt with fs_read. write its contents to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write"], "expect_tool": null}
+{"id": "fam14in-s04", "goal": "write in3.txt='alpha3'. read in3.txt with fs_read. write its contents to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write"], "expect_tool": null}
+{"id": "fam14in-s05", "goal": "write in4.txt='alpha4'. read in4.txt with fs_read. write its contents to answer.txt.", "expect_status": "succeeded", "expect_subsequence": ["fs_write", "fs_read", "fs_write"], "expect_tool": null}
