@@ -653,3 +653,69 @@ Total model calls: 300+
 
 Primary statistical result: p < 10^-6 (Fisher exact on 12 vs 12).
 Confirmatory: clean controls n=8, p ≈ 0.026 (Fisher exact on 8/8 vs 3/8).
+
+---
+
+## FINAL: strategy substitution, not capability degradation
+
+### 4-condition matrix at L4 (obs-bearing level), 2×2 by args × prompt
+
+| Prompt | Args | Sens | Spec | Bal. acc | Strategy |
+| Strict | populated | 12/12 | 20/20 | 1.000 | content comparison |
+| Strict | stripped  | 4/4   | 0/20  | 0.500 | structural rejection (no-sayer) |
+| Neutral| populated | 12/12 | 20/20 | 1.000 | content comparison |
+| Neutral| stripped  | 0/12  | 3/8   | 0.1875| length-plausibility (yes-sayer) |
+
+Both prompts agree with args populated. They invert when args are
+stripped. The verifier's behavior without content is
+prompt-scaffold-determined, not evidence-determined.
+
+### Mechanism traces (explicit quotes)
+
+Args populated (strict prompt), len-test-00:
+  "writes answer.txt with content 'XXXX-01-content'. That is not the
+   same content. So incorrect."
+  -> LITERAL STRING COMPARISON, not byte-length check.
+
+Args stripped (strict prompt), all 4 items identical:
+  "CALL fs_read({}) - but no filename specified... So INCORRECT."
+  -> STRUCTURAL DETECTION of malformed args, not content check.
+
+Args stripped (neutral prompt), all items:
+  "The trajectory read seed.txt, wrote answer.txt, length matches.
+   CORRECT."
+  -> LENGTH-PLAUSIBILITY fallback, not content check.
+
+### The claim
+
+The Evidence Sufficiency Frontier of trajectory self-verification is
+argument content at L4, and the absence of args.content produces a
+strategy substitution, not a capability gap. With args: literal
+content-string comparison, balanced accuracy 1.000 (12/12 sens,
+20/20 spec, Fisher p<1e-6). Without args: whichever degenerate
+strategy the prompt scaffold implies - strict prompt rejects empty
+args structurally (bal. acc 0.500), neutral prompt accepts plausible
+lengths (bal. acc 0.1875). Neither is content verification.
+
+### Why this matters for prior work
+
+Fixed-prompt evaluations of trajectory verifiers (Prose Barrier,
+trajectory-judge, FALAT) may be measuring the prompt, not the
+capability. The finding here is that the strategy is CONTROLLED BY
+THE PROMPT when content is absent. Any evaluation that does not
+report args-content status AND prompt scaffold cannot distinguish
+capability from scaffold artifact.
+
+### Experiment ledger
+
+~400 model calls across:
+- 5 evidence levels (L1-L5)
+- 2 args conditions (populated, stripped)
+- 2 prompts (strict verifier-system, neutral no-system)
+- 3 control sets (16 real trajectories, 8 buggy controls, 28 clean controls)
+- 3 seeds where applicable
+
+Primary statistic: specificity A/B at n=20 per condition,
+20/20 vs 0/20, Fisher p<1e-6.
+Secondary: strategy inversion between prompts at same items,
+observed on all 4 length-test items.
