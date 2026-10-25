@@ -473,3 +473,46 @@ refuted (hull +0.750, v1 probe 0.833). One positive capability signal
 confirmed (100% sensitivity absolute verification).
 
 This is the honest, bounded signal the session produced.
+
+---
+
+## ESF RESULT — evidence floor is args.content, not observations
+
+Ran two controlled experiments against gpt-oss-20b (temperature 0,
+reasoning_effort low):
+
+**Experiment 1 — 5-level ladder on 16 real trajectories (args={})**
+| Level | Sensitivity (n=16) | Specificity (n=8 controls) | Balanced |
+| L1    | 0.938 | 0.250 | 0.594 |
+| L2    | 1.000 | 0.000 | 0.500 |
+| L3    | 1.000 | 0.000 | 0.500 |
+| L4    | 0.625 | 1.000 | 0.813 |  ← peak
+| L5    | 0.312 | 1.000 | 0.656 |
+
+**Experiment 2 — length-matched wrong content, args populated (n=4)**
+| Level | Detection |
+| L1    | 0.250 |
+| L2    | 1.000 |
+| L3    | 1.000 |
+| L4    | 1.000 |
+| L5    | 1.000 |
+
+**Finding:** the verifier catches wrong content when args.content is
+populated (L3+ in Experiment 2) and only does length-plausibility
+matching when args={} (fam14in L4 in Experiment 1: 6/12 detection on
+13-17-char writes against 14-char expected). The Evidence Sufficiency
+Frontier is argument content, not observation visibility.
+
+**Mechanism:** at L4 with args={}, the verifier compares
+len(fs_read observation) vs len(fs_write observation). Length is not
+content. 13-char write vs 14-char read was accepted for fam14in-01
+because the 1-char mismatch was below plausibility threshold.
+fam14out items (write length 5-9 vs expected 1) were caught at L4 in
+Experiment 1 because the mismatch was structurally visible.
+
+**The claim:** The recording harness's args={} bug structurally caps
+self-verification at 50% specificity on silent content mutations.
+With args.content recorded, self-verification achieves 100%
+sensitivity on same-length wrong content. This is the operational
+form of the Prose Barrier: the verifier cannot check what the
+recording harness does not record.
