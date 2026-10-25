@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Self-verification probe — does the model judge its own trajectories?
+# Runs both standard reasoning and reasoning_effort=low, compares verdicts.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+python - <<'PY'
+import json
+from infra.env import load_env
+from infra.health import require_healthy
+load_env(required=True); require_healthy()
+
+from cfh.llm import default_client, extract_verdict
+from cfh.types import Step, StepKind, ToolCall, Trajectory
+
+llm = default_client()
+
+def render(t):
+    lines = []
+    for s in t.steps:
+        if s.tool_call:
+            lines.append(f"  CALL {s.tool_call.name}({json.dumps(s.tool_call.args)})")
+        elif s.observation is not None:
+            lines.append(f"  OBS  {s.observation}")
+    return "\n".join(lines)
+
+PROMPT = (
+    "You are an agent auditor. Read the goal and trajectory. "
+    "State whether the trajectory correctly achieves the goal. "
+    "Your ENTIRE reply must be one of two words: CORRECT or INCORRECT. "
+    "No explanation. No reasoning. Just the verdict word."
+)
+
+goal = "read seed.txt and write its contents to answer.txt."
+
+cases = {
+    "CORRECT": Trajectory(goal=goal, outcome="success", steps=[
+        Step(kind=StepKind.ASSISTANT, step_index=0, tool_call=ToolCall("fs_read",{"path":"seed.txt"},"c0")),
+        Step(kind=StepKind.TOOL_RESULT, observation="seed-01-content", step_index=1),
+        Step(kind=StepKind.ASSISTANT, step_index=2, tool_call=ToolCall("fs_write",{"path":"answer.txt","content":"seed-01-content"},"c1")),
+        Step(kind=StepKind.TOOL_RESULT, observation="written", step_index=3),
+    ]),
+    "BROKEN-content": Trajectory(goal=goal, outcome="fail", steps=[
+        Step(kind=StepKind.ASSISTANT, step_index=0, tool_call=ToolCall("fs_read",{"path":"seed.txt"},"c0")),
+        Step(kind=StepKind.TOOL_RESULT, observation="seed-01-content", step_index=1),
+        Step(kind=StepKind.ASSISTANT, step_index=2, tool_call=ToolCall("fs_write",{"path":"answer.txt","content":"WRONG"},"c1")),
+        Step(kind=StepKind.TOOL_RESULT, observation="written", step_index=3),
+    ]),
+    "SUBTLE-wrong-file": Trajectory(goal=goal, outcome="fail", steps=[
+        Step(kind=StepKind.ASSISTANT, step_index=0, tool_call=ToolCall("fs_read",{"path":"seed.txt"},"c0")),
+        Step(kind=StepKind.TOOL_RESULT, observation="seed-01-content", step_index=1),
+        Step(kind=StepKind.ASSISTANT, step_index=2, tool_call=ToolCall("fs_write",{"path":"other.txt","content":"seed-01-content"},"c1")),
+        Step(kind=StepKind.TOOL_RESULT, observation="written", step_index=3),
+    ]),
+    "SUBTLER-wrong-file": Trajectory(goal=goal, outcome="fail", steps=[
+        Step(kind=StepKind.ASSISTANT, step_index=0, tool_call=ToolCall("fs_read",{"path":"seed.txt"},"c0")),
+        Step(kind=StepKind.TOOL_RESULT, observation="seed-01-content", step_index=1),
+        Step(kind=StepKind.ASSISTANT, step_index=2, tool_call=ToolCall("fs_write",{"path":"other.txt","content":"seed-01-content"},"c1")),
+        Step(kind=StepKind.TOOL_RESULT, observation="written", step_index=3),
+    ]),
+}
+
+print("=" * 70)
+print("Self-verification probe — 2 modes × 3 cases × 2 samples")
+print("=" * 70)
+
+for mode in ["standard", "low"]:
+    print(f"\n--- mode: {mode} ---")
+    reasoning_effort = None if mode == "standard" else "low"
+    for name, t in cases.items():
+        msgs = [
+            {"role": "system", "content": PROMPT},
+            {"role": "user", "content": f"GOAL: {t.goal}\n\nTRAJECTORY:\n{render(t)}\n\nVerdict:"},
+        ]
+        verdicts = []
+        raw_samples = []
+        for _ in range(2):
+            try:
+                kw = {"temperature": 0.0, "max_tokens": 512}
+                if reasoning_effort:
+                    kw["reasoning_effort"] = reasoning_effort
+                raw = llm.complete(msgs, **kw)
+                raw_samples.append(raw[:120] if raw else "")
+                v = extract_verdict(raw)
+                verdicts.append(v)
+            except Exception as e:
+                verdicts.append(f"ERR:{e}")
+        match = "✓" if all(v == "CORRECT" for v in verdicts if v) or all(v == "INCORRECT" for v in verdicts if v) else "?"
+        print(f"  {name:22s} → {verdicts}   sample0={raw_samples[0][:60]!r}")
+PY

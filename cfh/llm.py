@@ -79,6 +79,11 @@ class OpenAICompatClient(LLMClient):
             "messages": messages,
             "temperature": kw.get("temperature", 0.0),
             "max_tokens": kw.get("max_tokens", 512),
+        }
+        if "reasoning_effort" in kw and kw["reasoning_effort"]:
+            payload["reasoning_effort"] = kw["reasoning_effort"]
+        # _post follows
+        data = None
             "logprobs": True,
             "top_logprobs": top_k,
         }
@@ -123,3 +128,21 @@ def default_client() -> LLMClient:
     model = os.environ.get("CFH_LLM_MODEL") or os.environ.get("AGI_MODEL") or "gpt-oss-20b"
     key = os.environ.get("CFH_LLM_KEY", "sk-noop")
     return OpenAICompatClient(base_url=base, model=model, api_key=key)
+
+
+def extract_verdict(text: str) -> str | None:
+    """Extract CORRECT or INCORRECT from a possibly-long reasoning reply.
+
+    Returns "CORRECT", "INCORRECT", or None. Prefers the last occurrence
+    (reasoning models conclude at the end of CoT).
+    """
+    if not text:
+        return None
+    t = text.upper()
+    # Find last standalone CORRECT or INCORRECT
+    import re
+    matches = re.findall(r"\b(IN)?CORRECT\b", t)
+    if not matches:
+        return None
+    last = matches[-1]
+    return "INCORRECT" if last == "INCORRECT" else "CORRECT"
