@@ -26,6 +26,7 @@ class ItemOutcome:
     passed: bool
     detail: str = ""
     tool_sequence: tuple[str, ...] = ()
+    steps: list[dict] | None = None
     agreement: float | None = None
     calibration_estimate: int | None = None
 

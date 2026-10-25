@@ -179,6 +179,7 @@ class EvalRunner:
                 passed=passed,
                 detail=detail,
                 tool_sequence=tool_sequence,
+                steps=result.get('results') if 'result' in locals() and isinstance(result, dict) else None,
                 agreement=agreement_this_item,
                 calibration_estimate=calibration_this_item,
             ))

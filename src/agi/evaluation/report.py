@@ -37,6 +37,7 @@ def to_json(result: EvalResult) -> str:
                 "run_id": o.run_id,
                 "detail": o.detail,
                 "tool_sequence": list(o.tool_sequence),
+                "steps": getattr(o, "steps", None),
                 "agreement": o.agreement,
                 "calibration_estimate": o.calibration_estimate,
             }
