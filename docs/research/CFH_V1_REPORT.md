@@ -873,3 +873,67 @@ fixed, the placeholder is visible and detectable. The model's
 capability gap (template-composition vs value-passing) and the
 verifier's evidence gap (args missing) were independent; the recording
 bugs caused the verifier gap, not the model gap."
+
+## Final measurement: verifier detects corruption, but not template syntax
+
+Four content conditions × 4 items × 5 levels, at L4 (args visible):
+
+| Content type | Example | L4 detected | Rate |
+| real | alpha0 | 0/4 | 0.00 |
+| junk | XXXXXXXXXXXXXXX | 4/4 | 1.00 |
+| empty | (empty string) | 4/4 | 1.00 |
+| placeholder | {{read_in0_output}} | 2/4 | 0.50 |
+
+The verifier:
+- Perfectly accepts correct content
+- Perfectly rejects obvious corruption (junk, empty)
+- Fails on template-reference syntax half the time
+
+Non-monotone across levels:
+| Level | placeholder | empty |
+| L1 | 3/4 | 2/4 |
+| L2 | 4/4 | 4/4 |
+| L3 | 0/4 | 4/4 |
+| L4 | 2/4 | 4/4 |
+| L5 | 1/4 | 0/4 |
+
+Placeholder detection collapses at L3 (0/4), returns partially at
+L4 (2/4), collapses again at L5 (1/4). Empty content is caught at
+L3-L4 (4/4) but flips to accepted at L5 (0/4).
+
+### The shared blind spot
+
+The model writes template placeholders as content ({{read_in0_output}}).
+The verifier accepts them as plausible references half the time. Both
+treat {{X}} as a valid reference to another step's output. Neither checks
+that substitution occurred. The runtime does not substitute, so the file
+content is wrong.
+
+This is the specific content failure: not "verifier cannot see content"
+(given args at L4, it perfectly distinguishes real from junk/empty) but
+"verifier cannot distinguish a semantically plausible reference from the
+resolved value." The failure is content-type-dependent: obvious corruption
+and missing content are caught; template-reference syntax is not.
+
+### Comparison to the length test (12/12 detection)
+
+Earlier, byte-length-matched mutations with corrupted content
+(XXXX-01-content) were detected at 12/12. The current test shows that
+placeholders with byte-length-matched content ({{read_in0_output}} = 19
+chars, matching what was read) are detected at 2/4. The distinguishing
+factor is not byte-length but semantic plausibility — "XXXX-01-content"
+is obviously wrong, "{{read_in0_output}}" is plausibly a valid reference.
+
+### Paper claim
+
+"Tool-use verification across the model, harness, and verifier shares a
+template-composition mental model that does not match the runtime. The
+model emits {{read_inN_output}} placeholders instead of resolved values;
+the verifier accepts them as plausible references to previous steps.
+Neither checks that substitution occurred. The failure is not blindness
+to all content — the verifier perfectly distinguishes real values from
+obvious corruption. It is a specific blindness to a class of wrong
+content that is semantically plausible as a valid reference. This
+explains why 13/16 real trajectories wrote template placeholders while
+the eval reported 20/24 as passed: the eval doesn't check content, and
+the verifier only catches content that is semantically implausible."
