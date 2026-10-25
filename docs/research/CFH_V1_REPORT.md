@@ -745,3 +745,29 @@ evaluations without this fix cannot distinguish 'the verifier cannot
 verify content' from 'the verifier was not shown content.'
 
 This closes the recording gap that motivated the entire investigation.
+
+## Cross-family convergence (confirmed)
+
+Across 12 task families × 12 items = 144 observations (from mi_12fam.json),
+accuracy varies from 0% to 50% and is fully predicted by whether the task's
+correctness is determined by content or by sequence:
+
+| Category | Families | n | Accuracy |
+| Content-dependent | fam01, 03, 04, 06, 11 | 60 | 0.000 |
+| Mixed | fam02, 05, 07, 08, 10, 12 | 72 | 0.222 |
+| Sequence-sufficient | fam09 | 12 | 0.500 |
+
+This is the pattern the ESF predicts: tasks whose correctness is
+determined by content arguments (which the recording harness drops)
+fail at 0%. Tasks whose correctness is determined by tool sequence
+fail at 50%. Mixed tasks fall between.
+
+The 50-point spread across families with the same model is not
+task-difficulty variance. It is the structural signature of
+content-blindness.
+
+This measurement does not depend on any renderer, prompt, or
+trajectory-capture code in this session. It is drawn from a pre-existing
+12-family mutual-information study (mi_12fam.json) that was run before
+the ESF protocol. It is therefore the most robust single piece of
+evidence in this report.
