@@ -516,3 +516,63 @@ With args.content recorded, self-verification achieves 100%
 sensitivity on same-length wrong content. This is the operational
 form of the Prose Barrier: the verifier cannot check what the
 recording harness does not record.
+
+---
+
+## FINAL ESF RESULT — args.content is the single-point frontier at L4
+
+Controlled A/B on 4 mutations with wrong content and correct byte length,
+differing only in whether args.content was populated:
+
+| Level | Args populated | Args stripped | Δ |
+| L4    | 1.000 | 0.250 | -0.750 |
+| L5    | 1.000 | 0.000 | -1.000 |
+
+Stripping args destroys detection at L4-L5, leaves L1-L3 unchanged.
+Arguments content is causally necessary for content verification.
+
+### Full matrix
+
+| Level | Sens(orig,args={}) | Spec(clean ctrl) | Sens(len test,args) | Sens(len test,args={}) |
+| L1    | 0.938 | 0.250 | 0.250 | 0.250 |
+| L2    | 1.000 | 0.000 | 1.000 | 1.000 |
+| L3    | 1.000 | 0.000 | 1.000 | 1.000 |
+| L4    | 0.625 | 1.000 | 1.000 | 0.250 |
+| L5    | 0.312 | 1.000 | 1.000 | 0.000 |
+
+### Three findings
+
+1. **L1-L3 broken clock.** Clean controls achieve 0.000 specificity
+   at L2-L3 (all 8 said INCORRECT despite correct content). The 1.000
+   sensitivity on wrong items at L2-L3 is a default-INCORRECT artifact,
+   not detection. Balanced accuracy = 0.500 = chance.
+
+2. **L4 is the frontier.** With args.content populated, sensitivity and
+   specificity both reach 1.000 — even at correct byte length. With
+   args={}, sensitivity drops to 0.250 (length-plausibility only).
+
+3. **L5 yes-sayer collapse without args.** Full context makes the
+   verifier accept `wrote N chars` == `len(observation)` as success.
+   Sensitivity drops to 0.000 without args, stays 1.000 with args.
+
+### Claim
+
+The Evidence Sufficiency Frontier for trajectory self-verification is
+argument content, and it is a single-point frontier at L4. Below it,
+verification is fixed-verdict chance. At it, verification is semantic.
+Above it, absent args, verification collapses to yes-saying. The
+recording harness's args={} bug structurally caps verification at
+chance on silent content mutations. This is the operational form of
+the Prose Barrier.
+
+### Experiment ledger
+
+180 total model calls:
+- 80 full ladder (16 trajectories × 5 levels, args={})
+- 40 buggy controls (rejected — inconsistent intent text)
+- 40 clean controls (internally consistent, args populated)
+- 20 length test (4 mutations × 5 levels, args populated)
+- 20 stripped length test (4 mutations × 5 levels, args={})
+
+The A/B at L4 is decisive: same content, same byte length, same
+intent text, same observations. Only args differed.
