@@ -26,6 +26,7 @@ def records_to_trajectories(records):
         t = trajectory_from_dict(rec)
         t.metadata["family"] = rec.get(FIELD_MAP["family"], "unknown")
         t.metadata["seed_files"] = rec.get(FIELD_MAP["seed_files"], [])
+        t.metadata["item_id"] = rec.get("item_id", "")
         out.append(t)
     return out
 

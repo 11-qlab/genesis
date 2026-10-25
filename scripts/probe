@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Standalone probe run on an existing artifact directory.
+# Usage: scripts/probe <artifact-dir> [--k 1] [--samples 1] [--limit 0]
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if [ $# -lt 1 ]; then
+    echo "usage: scripts/probe <artifact-dir> [--k 1] [--samples 1] [--limit 0]"
+    exit 1
+fi
+
+ART_DIR="$1"; shift
+
+python - <<PY
+import json, sys, time
+from pathlib import Path
+
+from infra.env import load_env
+from infra.health import require_healthy
+load_env(required=True)
+require_healthy()
+
+from cfh.adapters import load_jsonl, records_to_trajectories
+from cfh.discrimination import DiscriminationProbe
+from cfh.llm import default_client
+from cfh.metrics import discrimination_score, bootstrap_ci
+from cfh.twins import generate_twins
+
+# Parse remaining args
+argv = sys.argv[1:] if False else "${ART_DIR} $*".split()[1:]
+def get_arg(name, default):
+    if name in argv:
+        return type(default)(argv[argv.index(name) + 1])
+    return default
+
+k = get_arg("--k", 1)
+samples = get_arg("--samples", 1)
+limit = get_arg("--limit", 0)
+
+art = Path("${ART_DIR}")
+traj_path = art / "trajectories.jsonl"
+if not traj_path.exists():
+    raise SystemExit(f"no trajectories at {traj_path}")
+
+trajs = records_to_trajectories(load_jsonl(traj_path))
+successes = [t for t in trajs if t.outcome == "success"]
+print(f"{len(trajs)} trajectories, {len(successes)} successes, k={k} samples={samples}")
+
+if limit > 0:
+    successes = successes[:limit]
+
+llm = default_client()
+probe = DiscriminationProbe(llm, n_samples=samples, use_logprobs=False)
+results = []
+
+t0 = time.time()
+for i, s in enumerate(successes, 1):
+    fam = s.metadata.get("family", "unknown")
+    item_id = s.metadata.get("item_id", s.traj_id[:8])
+    twins = generate_twins(s, k=k, seed=i)
+    if not twins:
+        print(f"  [{i}/{len(successes)}] {fam}/{item_id} — no twins (skipped)")
+        continue
+    for j, tw in enumerate(twins):
+        r = probe.score_pair(s.goal, s, tw, pair_id=f"{fam}-{item_id}-{j}")
+        results.append((r, fam))
+        print(f"  [{i}/{len(successes)}] {fam}/{item_id}  p_a={r.p_a:.2f}  p_b={r.p_b:.2f}  label={r.label}  ({time.time()-t0:.0f}s)")
+
+out = art / "probe_results.jsonl"
+with out.open("w") as f:
+    for r, fam in results:
+        f.write(json.dumps({**r.__dict__, "family": fam}) + "\n")
+print(f"\nwrote {len(results)} results to {out}")
+
+# Aggregate by family (A is always the correct trajectory, twin is B)
+by_fam = {}
+for r, fam in results:
+    by_fam.setdefault(fam, []).append(r)
+
+print(f"\n{'='*60}")
+for fam, rs in sorted(by_fam.items()):
+    scores = [1.0 if r.label == "A" else 0.0 for r in rs]
+    acc, correct, used = discrimination_score(rs, ["A"] * len(rs), undecided_policy="half")
+    lo, hi = bootstrap_ci(scores, n_boot=1000)
+    print(f"{fam}: discrimination={acc:.3f} ({int(correct)}/{used})  95% CI [{lo:.3f}, {hi:.3f}]")
+
+# Overall
+all_scores = [1.0 if r.label == "A" else 0.0 for r, _ in results]
+if all_scores:
+    acc, correct, used = discrimination_score([r for r, _ in results], ["A"] * len(results))
+    lo, hi = bootstrap_ci(all_scores, n_boot=1000)
+    print(f"overall: discrimination={acc:.3f} ({int(correct)}/{used})  95% CI [{lo:.3f}, {hi:.3f}]")
+    print(f"total time: {time.time()-t0:.0f}s")
+PY
