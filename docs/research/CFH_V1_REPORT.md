@@ -576,3 +576,80 @@ the Prose Barrier.
 
 The A/B at L4 is decisive: same content, same byte length, same
 intent text, same observations. Only args differed.
+
+---
+
+## FINAL ESF — args presence is the frontier; absence drives below chance
+
+### 2×2 at L4 (obs-bearing level), the decisive table
+
+| Condition | Sens (n=12 wrong) | Spec (n=8 correct) | Bal. acc |
+| Args populated | 12/12 = 1.000 | 8/8 = 1.000 | 1.000 |
+| Args stripped  | 0/12  = 0.000 | 3/8 = 0.375 | 0.1875 |
+
+Removing args at L4 collapses balanced accuracy from 1.000 to
+0.1875 — BELOW chance. Not noise: the verifier becomes anti-correlated
+with truth (says CORRECT on all 12 wrong items, says INCORRECT on 5/8
+correct items).
+
+### Full 5×2 matrix (all levels, both args conditions)
+
+| Level | Sens(pop/strp) | Spec(pop/strp) | BalAcc(pop/strp) |
+| L1    | 0.417 / 0.083 | 0.250 / 0.500 | 0.334 / 0.292 |
+| L2    | 1.000 / 1.000 | 0.000 / 0.000 | 0.500 / 0.500 |
+| L3    | 1.000 / 1.000 | 0.000 / 0.000 | 0.500 / 0.500 |
+| L4    | 1.000 / 0.000 | 1.000 / 0.375 | 1.000 / 0.1875 |
+| L5    | 1.000 / 0.000 | 1.000 / 0.500 | 1.000 / 0.250 |
+
+### Three findings
+
+1. **L2-L3 is chance (bal. acc = 0.500) regardless of args.** The
+   verifier emits a fixed INCORRECT once intent and arg structure
+   appear. Sensitivity 1.000 / specificity 0.000 is a default, not
+   detection.
+
+2. **L4 is the frontier, and args presence is necessary and sufficient
+   for content verification.** With args: perfect (12/12, 8/8, bal.
+   acc 1.000). Without: below chance (0/12, 3/8, bal. acc 0.1875).
+   Fisher exact on length test: 12/12 vs 0/12, p < 10^-6.
+
+3. **Observation without args is worse than tool names alone.** L4
+   stripped bal. acc (0.1875) is lower than L1 stripped bal. acc
+   (0.292). Adding plausible observations to a stripped trajectory
+   actively misleads — "wrote 15 chars" matches the expected content
+   length, so wrong content is accepted that would have been rejected
+   at L1.
+
+### Mechanism (family asymmetry at L4-stripped)
+
+Without args, verifier defaults differ by task type:
+- Copy tasks (fam14in): observation "wrote N chars" matches expected
+  length → accepts. Spec = 3/4.
+- Count tasks (fam14out): no pattern args, cannot verify count → rejects.
+  Spec = 0/4.
+
+Both defaults are wrong relative to truth: wrong copies are accepted,
+correct counts are rejected. Composite specificity 3/8.
+
+### Claim
+
+The Evidence Sufficiency Frontier of trajectory self-verification is
+argument presence at L4 (observations visible). With args, verification
+is perfect on byte-length-matched wrong content. Without args, it
+drives below chance — length-plausibility defaults accept wrong copy
+outputs and reject correct count outputs. The recording harness's
+args={} bug is the boundary condition of the entire verifier.
+
+### Experiment ledger
+
+Total model calls: 300+
+- 80: full ladder (16 trajectories × 5 levels, args={})
+- 40: buggy controls (rejected — inconsistent intent)
+- 40: clean controls, args populated
+- 120: clean controls, args stripped (3 seeds × 40)
+- 20: length test, args populated
+- 60: length test, args stripped (3 seeds × 20)
+- (A/B replicated across 3 seeds for both conditions)
+
+Primary statistical result: p < 10^-6 (Fisher exact on 12 vs 12).
+Confirmatory: clean controls n=8, p ≈ 0.026 (Fisher exact on 8/8 vs 3/8).
