@@ -719,3 +719,29 @@ Primary statistic: specificity A/B at n=20 per condition,
 20/20 vs 0/20, Fisher p<1e-6.
 Secondary: strategy inversion between prompts at same items,
 observed on all 4 length-test items.
+
+---
+
+## Eval fix (accompanying commits) — three layers now distinguished
+
+The eval that produced the analyzed trajectories serialized only
+tool_sequence, dropping per-step args and observations. This was the
+structural cause of the content blind spot.
+
+The accompanying commits add ItemOutcome.steps, serialize it to JSON,
+and populate it from result['results'] — the same key already used by
+_first_failed_step, first_tool_from_result, and tool_sequence_from_result.
+
+The fix makes the eval faithful to what the model produced. It does
+NOT change what the model writes. Three layers must be distinguished:
+
+1. Recording (eval must surface steps) — fixed by this commit
+2. Generation (model must populate args) — model-dependent
+3. Content (model must write correct values) — model-dependent
+
+The ESF finding was made possible by layer-3 signals (byte-length
+mismatch in write observations) surviving the layer-1 defect. Future
+evaluations without this fix cannot distinguish 'the verifier cannot
+verify content' from 'the verifier was not shown content.'
+
+This closes the recording gap that motivated the entire investigation.
