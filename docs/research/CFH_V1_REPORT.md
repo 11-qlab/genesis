@@ -811,3 +811,65 @@ findings for this reason. It is a broken-clock artifact of the
 observation-free capture mode, not a detection result. The ESF A/B
 findings in this report are based on v2-manual, which has full
 observations.
+
+---
+
+## Fresh-run confirmation: model emits template placeholders despite populated args
+
+After fixing two recording-layer bugs (args dropped in _execute_step, args
+hardcoded in _normalize), a fresh eval run produced:
+
+    fs_read  args={"path": "in0.txt", "max_bytes": 1024}  output="alpha0"
+    fs_write args={"path": "answer.txt", "content": "{{read_in3_output}}",
+                   "mode": "overwrite"}  output="wrote 19 chars"
+
+len("{{read_in3_output}}") = 19, matching the reported write length.
+The model wrote a template placeholder string as the actual content.
+
+This reproduces the original v2-manual finding (13/16 items wrote
+placeholders like $read_seed.content, ${s1.content}, {{content}}) on
+fresh data, with args fully populated. The recording bugs hid the
+finding; they did not cause it.
+
+Three layers, now separable:
+1. Pipeline (args dropped) — FIXED by this session's two commits
+2. Model — tool call construction — WORKS (T6: 5/5, T3: 10/10)
+3. Model — value substitution — FAILS (fresh run: {{...}} literal)
+
+The failure mode: the model treats prior tool outputs as named
+variables to be referenced ({{read_in3_output}}), not as inline values
+to be resolved (alpha0). This is a template-composition mental model,
+not a value-passing model. The runtime does not perform template
+substitution.
+
+Comparison to T3 (which passed 10/10): T3 gave the value literally in
+the prompt ("the file contained exactly: seed-01-content"), so the model
+inlined it. Production gives a reference to a prior tool call ("fs_read
+returned alpha0"), and the model emits a template placeholder instead.
+The model can inline a value that's directly given; it cannot follow a
+tool-result reference and inline the resolved value.
+
+### The verifier's opportunity
+
+With args now visible (pipeline fixed), a verifier reading the fresh
+trajectory sees content="{{read_in3_output}}". This is a detectable
+signal — template syntax in a content field should be flagged as
+"placeholder not resolved." The verifier on v2-manual with args={}
+could not see this. On fresh data with args populated, it can.
+
+The ESF experiment's original framing holds: verifier content
+detection requires content in args. The fresh run confirms that when
+content is in args, the content is a placeholder — a specific,
+detectable failure mode.
+
+### Paper claim
+
+"The AGI gap is template-composition semantics, not recording or
+verification. gpt-oss-20b treats prior tool outputs as named template
+variables ({{read_in3_output}}) rather than inline values (alpha0).
+The recording harness's args={} bug hid this: without args in the
+evidence, the verifier could not see the placeholder. With the harness
+fixed, the placeholder is visible and detectable. The model's
+capability gap (template-composition vs value-passing) and the
+verifier's evidence gap (args missing) were independent; the recording
+bugs caused the verifier gap, not the model gap."
