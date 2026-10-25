@@ -112,7 +112,7 @@ class Coordinator:
 
         ok, output, meta = self._call_tool(budget, step.tool, step.args)
         tools_invoked.append(step.tool)
-        record.update(tool=step.tool, ok=ok, output=output, meta=meta,
+        record.update(tool=step.tool, args=step.args, ok=ok, output=output, meta=meta,
                       attempts=1, tools_invoked=list(tools_invoked))
         if ok:
             return record

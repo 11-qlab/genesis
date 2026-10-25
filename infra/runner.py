@@ -75,6 +75,45 @@ class ResilientRunner:
         ))
 
     def _normalize(self, item: dict, family: str) -> dict:
+        # Prefer the eval result's per-step data (has args + outputs)
+        if item.get("steps"):
+            traj_steps: list[dict] = []
+            idx = 0
+            for s in item["steps"]:
+                if not isinstance(s, dict):
+                    continue
+                tool = s.get("tool")
+                args = s.get("args")
+                output = s.get("output")
+                title = s.get("title") or ""
+                if tool:
+                    traj_steps.append({
+                        "kind": "assistant", "content": title, "step_index": idx,
+                        "tool_call": {
+                            "name": tool,
+                            "args": args if isinstance(args, dict) else {},
+                            "call_id": f"c{idx}",
+                        },
+                    })
+                    idx += 1
+                if output is not None:
+                    traj_steps.append({
+                        "kind": "tool_result",
+                        "observation": str(output),
+                        "step_index": idx,
+                    })
+                    idx += 1
+            return {
+                "goal": item.get("goal", ""),
+                "steps": traj_steps,
+                "outcome": "success" if item.get("passed") else "fail",
+                "family": family,
+                "item_id": item.get("id", ""),
+                "duration_ms": item.get("duration_ms", 0),
+                "status": item.get("status", "unknown"),
+                "detail": item.get("detail", ""),
+            }
+        # Fallback for old runs that only have tool_sequence
         seq = item.get("tool_sequence") or []
         steps = [{
             "kind": "assistant", "content": "", "step_index": i,
