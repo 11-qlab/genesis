@@ -1,0 +1,21 @@
+{
+  "started_at": "20261024-200026",
+  "env": {
+    "AGI_BASE_URL": "https://supplies-advisor-collect-bufing.trycloudflare.com/v1",
+    "AGI_MODEL": "gpt-oss-20b",
+    "AGI_PROVIDER": "colab",
+    "AGI_PROVIDER_KIND": "openai_compat"
+  },
+  "inside_bench": "fam14in",
+  "outside_bench": "fam14out",
+  "health": {
+    "ok": true,
+    "base_url": "https://supplies-advisor-collect-bufing.trycloudflare.com/v1",
+    "latency_ms": 169.6357689997967,
+    "model_count": 1,
+    "models": [
+      "gpt-oss-20b"
+    ],
+    "checked_at": 1792872026.8286176
+  }
+}
