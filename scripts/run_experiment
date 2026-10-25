@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Full experiment: health → eval in → eval out → probe → report.
+# Resumable: rerun after any tunnel death and it continues from checkpoint.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+INSIDE="${1:-fam14in}"
+OUTSIDE="${2:-fam14out}"
+SKIP_PROBE="${SKIP_PROBE:-0}"
+
+python - <<PY
+from infra.pipeline import run_experiment
+out = run_experiment(
+    inside_bench="${INSIDE}",
+    outside_bench="${OUTSIDE}",
+    skip_probe=${SKIP_PROBE} == "1",
+)
+print(f"\nartifact dir: {out}")
+PY

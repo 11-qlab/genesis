@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+python - <<'PY'
+import json, os
+from pathlib import Path
+from infra.env import load_env, ENV_FILE
+from infra.health import check_health
+
+print(f"env file: {ENV_FILE}  exists={ENV_FILE.exists()}")
+print(f"loaded: {load_env()}")
+print()
+h = check_health(timeout=10)
+print(json.dumps(h, indent=2))
+if not h.get("ok"):
+    print()
+    print("→ recover: scripts/infra_up")
+    raise SystemExit(1)
+PY

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Bootstrap the endpoint.
+#
+#   scripts/infra_up                              # local mode
+#     Starts cloudflared pointing at http://127.0.0.1:8080.
+#     Requires llama.cpp running locally.
+#
+#   scripts/infra_up <tunnel-url>                 # remote mode
+#     Stores the URL that Colab's cloudflared printed.
+#     Verifies it's reachable. No local process started.
+#
+#   UPSTREAM=http://127.0.0.1:9000 scripts/infra_up   # local, custom port
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if [ $# -ge 1 ] && [ -n "${1:-}" ]; then
+    # ── REMOTE MODE ──
+    URL="$1"
+    echo "→ remote mode, URL: $URL"
+    python - <<PY
+from infra.tunnel import set_remote_url
+try:
+    url = set_remote_url("${URL}")
+    print(f"✓ endpoint live: {url}")
+    print(f"  (saved to ~/.agi/env)")
+except SystemExit as e:
+    print(f"❌ {e}")
+    raise
+PY
+else
+    # ── LOCAL MODE ──
+    UPSTREAM="${UPSTREAM:-http://127.0.0.1:8080}"
+    export UPSTREAM
+
+    echo "→ local mode, upstream: $UPSTREAM"
+    if ! curl -sf -m 3 "$UPSTREAM/v1/models" >/dev/null; then
+        echo "❌ upstream not responding. Start llama.cpp first, or use remote mode:"
+        echo "     scripts/infra_up https://<colab-tunnel>.trycloudflare.com/v1"
+        exit 1
+    fi
+    echo "✓ upstream OK"
+
+    echo "→ starting cloudflared tunnel"
+    python - <<'PY'
+from infra.tunnel import TunnelSupervisor
+try:
+    url = TunnelSupervisor().start()
+    print(f"✓ tunnel live: {url}")
+    print(f"  (saved to ~/.agi/env)")
+except SystemExit as e:
+    print(f"❌ {e}")
+    raise
+PY
+fi
+
+echo
+echo "→ verifying endpoint"
+python - <<'PY'
+from infra.env import load_env
+from infra.health import require_healthy
+load_env(required=True)
+h = require_healthy()
+print(f"✓ {h['base_url']}  {h['latency_ms']:.0f}ms  models={h['models'][:3]}")
+PY
+
+echo
+echo "ready. next:"
+echo "    scripts/run_experiment fam14in fam14out"
