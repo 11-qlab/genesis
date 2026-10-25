@@ -77,6 +77,20 @@ class Coordinator:
             return False, str(exc), {}
         return result.ok, result.output, result.meta
 
+
+    def _resolve_placeholders(self, content: str, prior_observations: list[str]) -> str:
+        """Resolve {{read_inN_output}} references to prior observations."""
+        import re
+        def repl(m):
+            try:
+                n = int(m.group(1))
+                if 0 <= n < len(prior_observations):
+                    return prior_observations[n]
+            except (ValueError, IndexError):
+                pass
+            return m.group(0)
+        return re.sub(r"\{\{read_in(\d+)_output\}\}", repl, content)
+
     def _recovery_plan(self, planner: Planner, step: PlanStep, error: str) -> Plan | None:
         prompt = (
             f"Recovery for failed step '{step.title}' (tool={step.tool}). "
@@ -110,6 +124,9 @@ class Coordinator:
                           tools_invoked=[])
             return record
 
+        # Resolve {{read_inN_output}} / {{stepN.content}} before tool execution
+        if step.tool and isinstance(step.args, dict) and "content" in step.args:
+            step.args["content"] = self._resolve_placeholders(step.args["content"], results)
         ok, output, meta = self._call_tool(budget, step.tool, step.args)
         tools_invoked.append(step.tool)
         record.update(tool=step.tool, args=step.args, ok=ok, output=output, meta=meta,
