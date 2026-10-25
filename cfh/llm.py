@@ -79,11 +79,6 @@ class OpenAICompatClient(LLMClient):
             "messages": messages,
             "temperature": kw.get("temperature", 0.0),
             "max_tokens": kw.get("max_tokens", 512),
-        }
-        if "reasoning_effort" in kw and kw["reasoning_effort"]:
-            payload["reasoning_effort"] = kw["reasoning_effort"]
-        # _post follows
-        data = None
             "logprobs": True,
             "top_logprobs": top_k,
         }
@@ -131,18 +126,26 @@ def default_client() -> LLMClient:
 
 
 def extract_verdict(text: str) -> str | None:
-    """Extract CORRECT or INCORRECT from a possibly-long reasoning reply.
+    """Extract CORRECT or INCORRECT from a reply.
 
-    Returns "CORRECT", "INCORRECT", or None. Prefers the last occurrence
-    (reasoning models conclude at the end of CoT).
+    Checks for the leading verdict word first (models usually lead with
+    their answer). Falls back to searching anywhere in the reply.
+    INCORRECT takes precedence: if "INCORRECT" appears anywhere, the
+    verdict is INCORRECT unless the reply clearly opens with CORRECT.
     """
     if not text:
         return None
-    t = text.upper()
-    # Find last standalone CORRECT or INCORRECT
+    t = text.strip().upper()
+    # Leading token wins if it's the verdict
+    first_word = t.split()[0] if t.split() else ""
+    if first_word.startswith("INCORRECT"):
+        return "INCORRECT"
+    if first_word.startswith("CORRECT"):
+        return "CORRECT"
+    # Fallback: check INCORRECT before CORRECT (substring shadowing)
     import re
-    matches = re.findall(r"\b(IN)?CORRECT\b", t)
-    if not matches:
-        return None
-    last = matches[-1]
-    return "INCORRECT" if last == "INCORRECT" else "CORRECT"
+    if re.search(r"\bINCORRECT\b", t):
+        return "INCORRECT"
+    if re.search(r"\bCORRECT\b", t):
+        return "CORRECT"
+    return None

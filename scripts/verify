@@ -80,8 +80,8 @@ for mode in ["standard", "low"]:
                 if reasoning_effort:
                     kw["reasoning_effort"] = reasoning_effort
                 raw = llm.complete(msgs, **kw)
-                raw_samples.append(raw[:120] if raw else "")
                 v = extract_verdict(raw)
+                raw_samples.append(f"{v}|raw={raw[:40]!r}" if raw else "")
                 verdicts.append(v)
             except Exception as e:
                 verdicts.append(f"ERR:{e}")
