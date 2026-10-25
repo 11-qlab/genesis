@@ -771,3 +771,43 @@ trajectory-capture code in this session. It is drawn from a pre-existing
 12-family mutual-information study (mi_12fam.json) that was run before
 the ESF protocol. It is therefore the most robust single piece of
 evidence in this report.
+
+## Third recording-layer failure: tool_result steps dropped in some captures
+
+The 24-item run (artifacts/runs/20261024-200026/trajectories.jsonl)
+records only tool_call steps and omits tool_result steps. A render of
+fam14in-01 from that run shows:
+
+    CALL fs_read({})
+    CALL fs_write({})
+
+Compare to the same item in the v2-manual run:
+
+    CALL fs_read({})
+    OBS  'seed-01-content'
+    CALL fs_write({})
+    OBS  'wrote 13 chars to answer.txt'
+
+The 24-item capture has no observations. A verifier reading it sees
+two tool calls with empty args and no evidence of outcome. It returns
+INCORRECT uniformly — not detection, but a no-sayer default.
+
+This is the third distinct recording-layer failure documented in this
+report:
+1. args={} — content arguments empty (all runs)
+2. steps missing from eval_out.json — verifier can't see steps at all
+   (fixed by the accompanying commit)
+3. tool_result steps missing from some trajectory captures — verifier
+   sees tool calls but no observations (24-item run only)
+
+The first two are fixed or fixable by recording-harness changes. The
+third is a capture-mode difference: not every run produces the same
+trajectory schema. Any future verifier evaluation must specify which
+capture mode produced its inputs, because the verifier's behavior on
+the three modes is not the same.
+
+The 24-item ESF run (20/20 at every level) is excluded from the main
+findings for this reason. It is a broken-clock artifact of the
+observation-free capture mode, not a detection result. The ESF A/B
+findings in this report are based on v2-manual, which has full
+observations.
