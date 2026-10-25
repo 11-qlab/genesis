@@ -79,13 +79,13 @@ for r, fam in results:
 
 print(f"\n{'='*60}")
 for fam, rs in sorted(by_fam.items()):
-    scores = [1.0 if r.label == "A" else 0.0 for r in rs]
+    scores = [1.0 if r.label == "A" else (0.5 if r.label == "undecided" else 0.0) for r in rs]
     acc, correct, used = discrimination_score(rs, ["A"] * len(rs), undecided_policy="half")
     lo, hi = bootstrap_ci(scores, n_boot=1000)
     print(f"{fam}: discrimination={acc:.3f} ({int(correct)}/{used})  95% CI [{lo:.3f}, {hi:.3f}]")
 
 # Overall
-all_scores = [1.0 if r.label == "A" else 0.0 for r, _ in results]
+all_scores = [1.0 if r.label == "A" else (0.5 if r.label == "undecided" else 0.0) for r, _ in results]
 if all_scores:
     acc, correct, used = discrimination_score([r for r, _ in results], ["A"] * len(results))
     lo, hi = bootstrap_ci(all_scores, n_boot=1000)

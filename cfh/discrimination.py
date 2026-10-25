@@ -8,11 +8,35 @@ from .llm import LLMClient
 from .types import Trajectory
 
 
+def _extract_letter(text: str) -> str | None:
+    """Extract 'A' or 'B' from a possibly-long reply.
+
+    Strategy: prefer a leading A/B; otherwise the last standalone A/B in the
+    text; otherwise None.
+    """
+    t = text.strip()
+    if not t:
+        return None
+    if t[0] in ("A", "B"):
+        # Must be followed by non-alnum (space, punctuation, end)
+        if len(t) == 1 or not t[1].isalnum():
+            return t[0]
+    # Scan for standalone A/B tokens
+    import re as _re
+    matches = _re.findall(r"\b([AB])\b", t)
+    if matches:
+        return matches[-1]  # last one — reasoning models conclude
+    return None
+
+
 PROBE_SYSTEM = (
     "You are an expert agent auditor. You will be shown a goal and two "
-    "candidate trajectories (A and B). Decide which trajectory actually "
-    "achieves the goal using tools correctly. Answer with exactly one letter: "
-    "A or B. Do not explain."
+    "candidate trajectories (A and B). Decide which trajectory achieves the "
+    "goal using tools correctly.\n\n"
+    "RULES:\n"
+    "- Your ENTIRE reply must be a single character: A or B.\n"
+    "- Do not explain. Do not reason. Do not add punctuation or whitespace.\n"
+    "- Answer with A or B as the first character of your reply."
 )
 
 
@@ -77,7 +101,7 @@ class DiscriminationProbe:
     def _score_once(self, messages):
         if self.use_logprobs:
             try:
-                _, ts = self.llm.complete_with_logprobs(messages, max_tokens=4)
+                _, ts = self.llm.complete_with_logprobs(messages, max_tokens=512)
                 if ts is not None:
                     la = ts.for_token("A")
                     lb = ts.for_token("B")
@@ -90,10 +114,15 @@ class DiscriminationProbe:
                 pass
         votes = {"A": 0, "B": 0, "undecided": 0}
         for _ in range(self.n_samples):
-            txt = self.llm.complete(messages, temperature=0.8, max_tokens=4).strip().upper()
-            if txt.startswith("A"):
+            txt = self.llm.complete(
+                messages, temperature=0.2, max_tokens=256,
+            ).strip().upper()
+            # Reasoning models put the answer at the end of CoT, not the start.
+            # Scan the whole reply for standalone A/B letters.
+            letter = _extract_letter(txt)
+            if letter == "A":
                 votes["A"] += 1
-            elif txt.startswith("B"):
+            elif letter == "B":
                 votes["B"] += 1
             else:
                 votes["undecided"] += 1
