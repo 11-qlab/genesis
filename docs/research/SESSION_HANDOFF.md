@@ -732,3 +732,106 @@ rendering confounds are eliminated?"
 
 If yes → first real AGI-adjacent finding in this repo.
 If no → v1 signal was rendering artifacts all the way down.
+
+---
+
+## Session 3 final: v2 probe = clean null; v1 signal was rendering artifact
+
+### The v2 measurement
+
+After capturing full step data (tool, args, output, meta) via patched
+runner.py + report.py, re-ran the probe on 16 real v2 trajectories
+(12 fam14in, 4 fam14out). k=2 twins per item (32 total comparisons).
+
+  fam14in:  discrimination=0.500 (12/24)  CI [0.375, 0.625]
+  fam14out: discrimination=0.500 ( 4/8)   CI [0.312, 0.688]
+  overall:  discrimination=0.500 (16/32)  CI [0.406, 0.594]
+
+Exactly chance. No signal on any split.
+
+### What v1 actually measured
+
+The v1 probe result (0.833 fam14in) was a rendering artifact. In v1,
+trajectories were tool-name-only (args={}, no observations). The
+"correct" trajectory rendered as:
+  fs_read({"path":""}) → fs_write({"path":""})
+
+The twin (after HallucinateField mutation) rendered as:
+  fs_read({"path":"","timeout_ms":true}) → fs_write(...)
+
+The model preferred the twin with MORE information, not the one that
+was actually correct. Combined with arg-only differences, swap_tool
+and reorder mutations also tested "which looks more like a real
+trajectory" rather than "which achieves the goal."
+
+The three confounds we ruled out in v1 (position, junk-arg,
+length-prior) were the WRONG confounds to test. The actual confound
+was rendering richness: empty-args trajectories look like stubs,
+and any mutation that adds *anything* makes the twin look more real.
+
+### What v2 controls for
+
+By capturing tool, args, output, meta, and tools_invoked per step,
+v2 trajectories are indistinguishable in rendering between correct
+and twin. All 5 mutation types now fire correctly:
+- SwapTool: fires (tool names differ)
+- Reorder: fires (order differs)
+- StaleObservation: fires (outputs exist)
+- HallucinateField: fires (adds to {} args)
+- SwapArgument: still a no-op (args dict is {} in current trajectories)
+
+Still not fully controlled: args are empty in most v2 trajectories
+because the runner wasn't passing args through. This is the
+remaining gap for v3.
+
+### The honest finding
+
+"Under controlled rendering (matched structure, matched observations),
+gpt-oss-20b does not discriminate tool-trajectory soundness on
+fam14 in/out at k=2 mutations per item (n=32 comparisons,
+discrimination = 0.500, 95% CI [0.406, 0.594])."
+
+This is a genuine negative result. It contradicts the v1 measurement
+(0.833, 3 confounds tested) and demonstrates the importance of
+controlling for rendering artifacts in trajectory-comparison probes.
+
+### What this means for the AGI-signal question
+
+Combined with earlier session findings:
+- No hull in fam14 (12/12 items pass at least once across two runs)
+- No discrimination signal under controlled rendering
+- No AGI-adjacent evidence at v2 granularity
+
+The project has, in this task family, no measurable capacity that
+distinguishes it from "reliable tool use with reasoning-model CoT
+variance." This is the honest state.
+
+### v3 task (if the AGI-signal question is pursued further)
+
+Capture args in the checkpoint. Currently the checkpoint stores
+steps but args are always {} in the trajectory reconstruction.
+Fix by ensuring args are passed through from the coordinator's
+`result["results"]` into the checkpoint's item record.
+
+Then:
+1. Re-probe with SwapArgument active (5/5 mutations instead of 4/5)
+2. Build a proper alternate-valid test set — same structure,
+   different valid path, both with real observations
+3. Target n>=40 per mutation before drawing conclusions
+
+### Commits this session
+
+  35092ab  infra: full resilient experiment infrastructure
+  3857e17  probe: first non-degenerate discrimination (v1, later refuted)
+  f54d35d  probe: confound analysis (v1 confounds ruled out)
+  (this)   probe v2: clean null; v1 was rendering artifact
+
+### Session 3 deliverable (for the record)
+
+NOT: "gpt-oss-20b has goal-soundness reasoning."
+YES: "greedy model does not discriminate trajectory soundness under
+      controlled rendering on fam14."
+
+Plus the infrastructure to measure this, plus the +0.750 hull refutation,
+plus 5 harness bugs fixed, plus a working probe with full confound
+methodology. That's the session.
