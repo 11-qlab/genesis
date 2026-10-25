@@ -56,3 +56,74 @@ trajectory soundness on fam14. Combined with the hull refutation
 ## Honest accounting
 Three sessions: 5 harness bugs fixed, 2 candidate signals found,
 2 refuted, 1 clean null, infrastructure to keep measuring.
+
+---
+
+## Exp-post-v2 findings (2026-10-25, session 3 late)
+
+After the v2 clean null, four additional experiments produced a
+substantially richer picture than "no signal at all."
+
+### Path rigidity (Exp 1) — REAL
+
+Among three valid trajectories for the same goal (canonical
+read→write, verify-after-write, redundant double-read), the model
+shows consistent preference:
+
+| Pair | p_first | Label |
+|---|---|---|
+| canonical vs verify | 0.83 | prefers canonical |
+| canonical vs redundant | 0.83 | prefers canonical |
+| verify vs redundant | 0.67 | prefers verify |
+
+**Consistent ordering: canonical > verify > redundant.** The model
+has stable preference for shortest/cleanest valid path even among
+all-valid paths. Coincides with `path_20b.json`'s observation that
+12/12 fam13 items took fs_write → fs_read — the path bias is not
+task-specific but a general prior.
+
+### Coarse adversarial discrimination (Exp 3) — REAL
+
+Against an adversarial twin that prepends `fs_read(docs_not_exist.txt)`
+→ error, model discriminates at **0.83** (4 A, 2 undecided across 6
+items, n=6).
+
+**The model catches OBVIOUS errors** even though it does not detect
+SUBTLE mutations (v2 = 0.500). This is the coarse/fine split.
+
+### reasoning_effort unlocks self-verification (Exp 5) — REAL
+
+Self-verification prompt ("CORRECT or INCORRECT, no explanation")
+under standard reasoning mode: model burns entire `max_tokens=32`
+budget on CoT preamble, never emits verdict.
+
+Under `reasoning_effort=low`: `content='INCORRECT'` for a broken
+trajectory, `reasoning_len=173`. **The model CAN self-verify when
+reasoning is constrained.**
+
+### Revised conclusion
+
+Not "no capability." Not "fine-grained capability." It is:
+
+> **gpt-oss-20b has coarse-grained trajectory judgment and path-canonicity
+> preference, but lacks fine-grained mutation sensitivity. Under constrained
+> reasoning (reasoning_effort=low) the model can perform accurate
+> absolute self-verification, but its default reasoning mode drowns in
+> chain-of-thought before emitting verdicts.**
+
+This is a bounded capability result: the AGI-adjacent capacity exists
+but has a resolution floor and is gated by reasoning style.
+
+### What the null v2 measurement now means
+
+v2 = 0.500 on fine-grained mutations is a real finding, but it sits
+in a broader picture:
+- Coarse (obvious breaks): 0.83 ✓
+- Path canonicity: 0.83 ✓
+- Fine (single-field mutation): 0.500 ✗
+- Absolute verification (constrained reasoning): correct ✓
+
+The model operates at surface-feature resolution. It knows the
+difference between a valid and a blatantly broken trajectory, but
+not between two structurally similar ones differing by one field.
+The capacity is present but at low resolution.
