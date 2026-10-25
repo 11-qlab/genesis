@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+python - <<'PY'
+import json, re
+from infra.env import load_env
+from infra.health import require_healthy
+load_env(required=True); require_healthy()
+
+from cfh.adapters import load_jsonl, records_to_trajectories
+from cfh.llm import default_client, extract_verdict
+from cfh.types import Step, StepKind, ToolCall, Trajectory
+
+trajs = records_to_trajectories(load_jsonl("artifacts/runs/v2-manual/trajectories.jsonl"))
+successes = [t for t in trajs if t.outcome == "success"]
+print(f"loaded {len(successes)} real successes\n")
+
+llm = default_client()
+
+def infer_args_from_title(title: str, tool: str) -> dict:
+    """Best-effort args from title — fixes the rendering bug where
+    coordinators drop args. Titles are like:
+      'Read seed.txt'           -> {path: 'seed.txt'}
+      'Write to answer.txt'     -> {path: 'answer.txt'}
+      'Search seed.txt for pattern \\'seed\\'' -> {path, pattern}
+    """
+    args = {}
+    if not title: return args
+    # Paths
+    for pat in [r"Read\s+([^\s,']+)", r"Write to\s+([^\s,']+)",
+                r"Search\s+([^\s,']+)", r"from\s+([^\s,']+)",
+                r"to\s+([^\s,']+\.(?:txt|json|sqlite3|db))"]:
+        m = re.search(pat, title, re.I)
+        if m and 'path' not in args:
+            args['path'] = m.group(1).rstrip(".,;")
+    # Regex pattern
+    m = re.search(r"pattern\s+['\"]([^'\"]+)['\"]", title, re.I)
+    if m: args['pattern'] = m.group(1)
+    return args
+
+def render(t):
+    lines = [f"GOAL: {t.goal}", "", "TRAJECTORY:"]
+    for s in t.steps:
+        if s.tool_call:
+            args = s.tool_call.args or {}
+            lines.append(f"  CALL {s.tool_call.name}({json.dumps(args)})")
+        elif s.observation is not None:
+            obs = s.observation if len(s.observation) < 150 else s.observation[:150]+"..."
+            lines.append(f"  OBS  {obs}")
+    return "\n".join(lines)
+
+PROMPT = (
+    "You are an agent auditor. Read the goal and trajectory. "
+    "State whether the trajectory correctly achieves the goal. "
+    "Your ENTIRE reply must be one of two words: CORRECT or INCORRECT. "
+    "No explanation."
+)
+
+def with_inferred_args(traj):
+    """Clone traj with args inferred from title, so rendering looks real."""
+    twin = traj.clone()
+    for step in twin.steps:
+        if step.tool_call and not step.tool_call.args:
+            title = step.metadata.get("title", "")
+            step.tool_call.args = infer_args_from_title(title, step.tool_call.name)
+    return twin
+
+def apply_mutation(traj, kind):
+    """kind in {'correct', 'subtle', 'obvious'}. All rendered with inferred args."""
+    t = with_inferred_args(traj)
+    if kind == "correct":
+        t.outcome = "success"
+        return t
+    t.outcome = "fail"
+    tool_idxs = [i for i,s in enumerate(t.steps) if s.tool_call]
+    if not tool_idxs: return None
+    if kind == "subtle":
+        # Swap a tool name — model needs to notice the wrong tool was called
+        i = tool_idxs[-1]
+        t.steps[i].tool_call.name = "fs_list"  # writes become list
+        t.steps[i].tool_call.args = {}
+    elif kind == "obvious":
+        # DROP the write step entirely — goal not achieved.
+        # This is a genuine break (no more error-recovery ambiguity).
+        # Find the write step and remove it plus its observation.
+        write_idx = None
+        for i in tool_idxs:
+            if t.steps[i].tool_call.name == "fs_write":
+                write_idx = i
+                break
+        if write_idx is None:
+            # fallback: remove last tool call
+            write_idx = tool_idxs[-1]
+        drop = {write_idx}
+        if write_idx + 1 < len(t.steps):
+            drop.add(write_idx + 1)
+        t.steps = [s for i, s in enumerate(t.steps) if i not in drop]
+    return t
+
+results = []
+for i, s in enumerate(successes, 1):
+    for kind in ["correct", "subtle", "obvious"]:
+        t = apply_mutation(s, kind)
+        if t is None: continue
+        msgs = [
+            {"role":"system","content":PROMPT},
+            {"role":"user","content":render(t) + "\n\nVerdict:"},
+        ]
+        try:
+            raw = llm.complete(msgs, temperature=0.0, max_tokens=512)
+            v = extract_verdict(raw)
+            expected = "CORRECT" if kind == "correct" else "INCORRECT"
+            correct = (v == expected)
+            results.append({"item": s.metadata.get("item_id","?"), "kind": kind,
+                           "expected": expected, "got": v, "correct": correct,
+                           "family": s.metadata.get("family","?")})
+            mark = "✓" if correct else "✗"
+            print(f"  {mark} [{i}/{len(successes)}] {s.metadata.get('item_id','?'):20s} {kind:8s} → {v}")
+        except Exception as e:
+            print(f"  ERR {s.metadata.get('item_id','?')} {kind}: {type(e).__name__}: {e}")
+
+print(f"\n{'='*60}")
+total = len(results)
+correct = sum(1 for r in results if r["correct"])
+print(f"OVERALL: {correct}/{total} = {correct/total:.3f}\n")
+for kind in ["correct", "subtle", "obvious"]:
+    rs = [r for r in results if r["kind"] == kind]
+    if rs:
+        n = sum(1 for r in rs if r["correct"])
+        print(f"  {kind:8s}: {n}/{len(rs)} = {n/len(rs):.3f}")
+
+import pathlib
+out = pathlib.Path("artifacts/runs/v2-manual/verify_results_v2.jsonl")
+with out.open("w") as f:
+    for r in results:
+        f.write(json.dumps(r) + "\n")
+print(f"\nwrote {len(results)} results to {out}")
+PY

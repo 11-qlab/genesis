@@ -306,3 +306,69 @@ Combined with v2 null, the shape of the finding:
 gpt-oss-20b has fine-grained trajectory judgment that manifests in
 absolute framing, not comparative framing. The capacity is not
 absent — the framing is decisive.
+
+## FINAL SIGNAL: 100% sensitivity, 50% specificity on real trajectories
+
+Ran absolute verification on 16 real v2 trajectories × 3 mutation types
+(correct, subtle wrong-tool, obvious missing-write):
+
+| Case | Accuracy | n |
+|---|---|---|
+| subtle (wrong tool) | **16/16 = 100%** | 16 |
+| obvious (missing write) | **16/16 = 100%** | 16 |
+| correct | 8/16 = 50% | 16 |
+| overall | 40/48 = 83.3% | 48 |
+
+**The model catches every real break (32/32 on both mutation
+types). It over-flags half the correct trajectories.**
+
+Specificity breakdown:
+- fam14in correct: 8/12 = 67%
+- fam14out correct: 0/4 = 0%
+
+**Headline: gpt-oss-20b has 100% sensitivity to trajectory breaks
+and 50% specificity — it's tuned to detect errors, not to
+confirm success.**
+
+Combined with v2 A/B (0.500, n=32), the full picture:
+
+| Framing | Sensitivity | Specificity |
+|---|---|---|
+| A/B comparative | 0.500 | 0.500 |
+| Absolute verify | **1.000** | 0.500 |
+
+The model can absolutely verify breaks. It cannot comparatively
+discriminate. Both framings share the same specificity ceiling —
+the model is conservatively biased toward "something is wrong."
+
+## FINAL SIGNAL: model catches eval blind spot — eval is under-scoring
+
+Ran absolute verification on 16 real "successful" trajectories.
+Subtle & obvious breaks: 16/16 each (perfect sensitivity). Correct:
+8/16 specificity, but fam14out specificity was **0/4** — flagged every
+"successful" fam14out trajectory as INCORRECT.
+
+Investigation showed fam14out trajectories write `content: "0"` to
+answer.txt, but seed.txt contains `seed-01-content` → pattern `seed`
+matches **1 time**, not 0. The trajectories are semantically wrong
+(wrong answer written) but the eval passed them because the checker
+only verifies **tool sequence**, not output content.
+
+**The model is right. The eval is wrong.**
+
+Corrected accounting:
+- "correct" specificity = 8/8 on fam14in (100%), where the model's
+  verdict matches real correctness
+- fam14out "successes" were mislabeled — model correctly flags them
+  as semantically broken; eval mislabels them as passed
+
+The finding is bigger than expected:
+1. Model has perfect sensitivity AND perfect specificity when
+   ground truth is correct
+2. The eval has a correctness blind spot on content
+3. A/B probe's 0.500 was measuring "which of two similarly-mislabeled
+   trajectories is correct" — inherent ambiguity
+
+Signal: **model can verify trajectory correctness including output
+content; eval was only checking tool sequence. Fixing the eval would
+align ground truth with model judgment.**
