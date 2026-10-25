@@ -662,3 +662,73 @@ If no → the v1 signal was rendering artifacts all the way down.
 
 Ready for next session: clean tree, working probe, correct interpretation
 of what the v1 signal does and doesn't support.
+
+---
+
+## Session 3 (2026-10-25): infrastructure + first probe signal
+
+### Infrastructure (committed)
+
+`infra/` package + `scripts/infra_up|infra_health|run_experiment` +
+`scripts/probe`. Single source of truth is `~/.agi/env`. Per-item
+checkpoints in `~/.agi/checkpoints/`. Trajectories captured
+incrementally to `artifacts/runs/<timestamp>/trajectories.jsonl`.
+
+Run experiment: `scripts/run_experiment fam14in fam14out`
+Resume after tunnel death: rerun same command after `scripts/infra_up <new-colab-url>`
+
+### Hull question — CLOSED
+
+Two full 12-item fam14out runs:
+- 20261024-200026: 8/12 passed
+- 20261024-212316: 9/12 passed
+- Failure subsets disjoint (different items failed each run)
+- Union: 12/12 items have passed at least once
+
+Every item is solvable. Failures are CoT-length stochastic variance
+(373s item passes at 20s next run). No capability boundary in fam14.
+The +0.750 hull gap is fully retracted. The original "first defensible
+AGI-adjacent result" from session 1 was three stacked harness bugs +
+tunnel instability misread as capability.
+
+### cfh probe — first non-degenerate measurement
+
+Tool-name-only trajectories from 20261024-200026, k=1 samples=1:
+- fam14in:  0.833 (10/12)  CI [0.625, 1.000]  — significant
+- fam14out: 0.500 (4/8)    CI [0.250, 0.750]  — chance
+- samples=3 confirmation on 6 fam14in: 1.000
+
+Confound tests (all ruled out):
+- Position bias: 1A/2B/3U on correct-vs-identical
+- Junk-arg shortcut: mutation swap_tool=0.75, reorder=1.00
+- Length prior: alternate-valid (2-call vs 3-call, same rendering),
+  mean=0.38, mostly-undecided
+
+### What's suggested but not proven
+
+At v1 (tool names only), the model discriminates tool-sequence
+mutations at rates above chance. Three alternative explanations
+tested and refuted. Suggestive of tool-sequence soundness reasoning.
+NOT PROVEN — n=4 per mutation is too small, hard-null mostly-undecided.
+
+### What's disproven
+
+- +0.750 hull gap (session 1's headline)
+- +0.667 hull gap (session 2's intermediate)
+- Junk-arg / length-prior / position-bias explanations for 0.833
+- "Shortcut policy again" (commit 9998433 Control A diagnosis)
+
+### v2 next-session task (single focus)
+
+Patch runner.py to serialize `result["results"]` per item (full step
+args + observations, not just tool_sequence). Re-run fam14in+out with
+v2 capture. Re-run probe on v2 trajectories. Target n>=12 per mutation
+type. Build a proper alternate-valid set where both trajectories have
+real args/observations and differ only in path structure.
+
+Goal: answer ONE question with confidence — "does gpt-oss-20b
+discriminate tool-sequence soundness on trajectories where all
+rendering confounds are eliminated?"
+
+If yes → first real AGI-adjacent finding in this repo.
+If no → v1 signal was rendering artifacts all the way down.

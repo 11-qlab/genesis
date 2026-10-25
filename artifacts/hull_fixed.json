@@ -1,0 +1,15 @@
+{
+  "inside": {
+    "passed": 12,
+    "total": 12,
+    "acc": 1.0
+  },
+  "outside": {
+    "passed": 4,
+    "total": 12,
+    "acc": 0.3333333333333333
+  },
+  "gap": 0.6666666666666667,
+  "verdict": "strongly hull-bounded",
+  "model": "gpt-oss-20b"
+}
