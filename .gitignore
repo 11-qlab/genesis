@@ -22,3 +22,4 @@ experiments/*
 .agi_env
 !artifacts/*.json
 artifacts/agi_signal_*.json
+artifacts/mi_missing_20b.json
