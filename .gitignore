@@ -21,3 +21,4 @@ experiments/*
 !checkpoints/.gitkeep
 .agi_env
 !artifacts/*.json
+artifacts/agi_signal_*.json
