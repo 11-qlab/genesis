@@ -1,0 +1,107 @@
+{
+  "hypotheses": [
+    {
+      "id": "H001",
+      "completed_at": "2026-10-26T21:01:00Z",
+      "n_pairs": 68,
+      "agree": 68,
+      "disagree": [],
+      "mcnemar_p": 1.0,
+      "verdict": "PASS"
+    },
+    {
+      "id": "H002",
+      "n_items": 17,
+      "flips": [
+        {
+          "item": "n20-placeholder-01",
+          "verdicts": [
+            "INCORRECT",
+            "INCORRECT",
+            "CORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-02",
+          "verdicts": [
+            "INCORRECT",
+            "CORRECT",
+            "CORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-04",
+          "verdicts": [
+            "INCORRECT",
+            "INCORRECT",
+            "CORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-08",
+          "verdicts": [
+            "INCORRECT",
+            "INCORRECT",
+            "CORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-09",
+          "verdicts": [
+            "INCORRECT",
+            "CORRECT",
+            "INCORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-12",
+          "verdicts": [
+            "INCORRECT",
+            "CORRECT",
+            "INCORRECT"
+          ]
+        },
+        {
+          "item": "n20-placeholder-16",
+          "verdicts": [
+            "INCORRECT",
+            "CORRECT",
+            "CORRECT"
+          ]
+        }
+      ],
+      "verdict": "PASS"
+    },
+    {
+      "id": "H003",
+      "n": 10,
+      "baseline_ph": 3,
+      "patched_ph": 1,
+      "improvements": 2,
+      "regressions": 0,
+      "mcnemar_p": 0.5,
+      "bf10": 1.3326666666666667,
+      "verdict": "REJECTED"
+    }
+  ],
+  "bh_correction": [
+    {
+      "id": "H002",
+      "p": 0.01,
+      "threshold": 0.016666666666666666,
+      "reject_null": true
+    },
+    {
+      "id": "H003",
+      "p": 0.5,
+      "threshold": 0.03333333333333333,
+      "reject_null": false
+    },
+    {
+      "id": "H001",
+      "p": 1.0,
+      "threshold": 0.05,
+      "reject_null": false
+    }
+  ]
+}

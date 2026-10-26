@@ -1,0 +1,11 @@
+{
+  "id": "H003",
+  "n": 10,
+  "baseline_ph": 3,
+  "patched_ph": 1,
+  "improvements": 2,
+  "regressions": 0,
+  "mcnemar_p": 0.5,
+  "bf10": 1.3326666666666667,
+  "verdict": "REJECTED"
+}

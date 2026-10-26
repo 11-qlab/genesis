@@ -1,0 +1,9 @@
+{
+  "id": "H001",
+  "completed_at": "2026-10-26T21:01:00Z",
+  "n_pairs": 68,
+  "agree": 68,
+  "disagree": [],
+  "mcnemar_p": 1.0,
+  "verdict": "PASS"
+}
