@@ -24,3 +24,5 @@ experiments/*
 artifacts/agi_signal_*.json
 artifacts/mi_missing_20b.json
 genesis/
+.coverage
+.import_linter_cache/
