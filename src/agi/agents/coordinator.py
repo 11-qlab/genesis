@@ -126,7 +126,9 @@ class Coordinator:
 
         # Resolve {{read_inN_output}} / {{stepN.content}} before tool execution
         if step.tool and isinstance(step.args, dict) and "content" in step.args:
-            step.args["content"] = self._resolve_placeholders(step.args["content"], results)
+            # TEMP-DISABLED-FOR-PROMPT-FIX-TEST
+            # step.args["content"] = self._resolve_placeholders(step.args["content"], results)
+            pass
         ok, output, meta = self._call_tool(budget, step.tool, step.args)
         tools_invoked.append(step.tool)
         record.update(tool=step.tool, args=step.args, ok=ok, output=output, meta=meta,

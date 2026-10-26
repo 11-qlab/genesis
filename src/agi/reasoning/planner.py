@@ -37,7 +37,11 @@ SYSTEM_PROMPT = (
     "8. The memory store is a separate domain from the filesystem. Goals that "
     "reference 'notes', 'docs', 'documents', 'memory', 'knowledge', or 'what I "
     "wrote' refer to the memory store and MUST use `memory_search`. Do not "
-    "assume those words name files or directories on disk; they are not."
+    "assume those words name files or directories on disk; they are not.\n"
+    "9. For fs_write, the 'content' argument MUST be the literal string. "
+    "Do NOT use {{...}}, $X, or reference syntax. Prior step outputs "
+    "are NOT auto-substituted; you must inline the actual value."
+
 )
 
 
