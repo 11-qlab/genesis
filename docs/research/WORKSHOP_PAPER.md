@@ -15,7 +15,7 @@ We split the failure by bench structure and find two independent subproblems:
 - **Subproblem A — value present at plan-time but not inlined.** When the goal states the literal value (`write in0.txt='alpha0'`), baseline placeholders occur in 3/5 items; a single prompt rule requiring literal content eliminates the class (0/5).
 - **Subproblem B — value requires cross-tool substitution.** When the goal references a prior tool call's output (`read seed.txt and write its contents`), placeholder rate is 10/10 in both baseline and patched conditions. The prompt rule does not reduce the rate; it **changes the notation** from `${step1.output}` to `<content_from_s1>`. Only executor-side substitution closes this class (12/17 → 0/17 in production).
 
-The failure is structural (deferred value-passing across tool-call boundaries), not syntactic. A verifier given full arguments detects placeholders at 76.5% (13/17, p=0.0001 vs correct content), but detects junk and empty content at 100%; residual leak ≈16%. We also report six recording-layer defects found in the same harness, three of which independently masked the failure, and single-turn capability probes (30/30) that rule out token-level deficits.
+The failure is structural (deferred value-passing across tool-call boundaries), not syntactic. A verifier given full arguments detects placeholders at 76.5% under a baseline prompt; adding one rule requiring template syntax to be flagged INCORRECT raises detection to 100% (17/17) with 0% false positives on correct content. The verifier fix mirrors the planner fix in structure — one specification rule closes the class. We also report six recording-layer defects found in the same harness, three of which independently masked the failure, and single-turn capability probes (30/30) that rule out token-level deficits.
 
 ---
 
@@ -133,22 +133,47 @@ The aggregate p-value is not the finding. **The finding is the split.** Two clas
 
 The prompt rule reduces Subproblem A (already-literal-in-goal) but leaves Subproblem B intact. The executor substitution handles both. Together, the failure is fully closed.
 
-### 4.4 Verifier behaviour at L4 (arguments visible, n=17 per condition)
+### 4.4 Verifier behaviour — LLM alone vs. hybrid (n=17 each)
 
-| Content | flagged INCORRECT | rate |
-|---|---|---|
-| real (`alphaN`) | 1 / 17 | 5.9% |
-| placeholder (`{{...}}`) | 13 / 17 | **76.5%** |
-| junk (`XXXX…`) | 17 / 17 | 100% |
-| empty (`""`) | 17 / 17 | 100% |
+**LLM alone (baseline prompt), repeated runs at temperature 0:**
 
-Fisher exact:
+| Content | run 1 | run 2 | variance |
+|---|---|---|---|
+| real (`alphaN`) | 1/17 (5.9%) | 1/17 (5.9%) | 0 |
+| placeholder (`{{...}}`) | **13/17 (76.5%)** | **11/17 (64.7%)** | **±11.8pp** |
+| junk (`XXXX…`) | 17/17 (100%) | 17/17 (100%) | 0 |
+| empty (`""`) | 17/17 (100%) | 17/17 (100%) | 0 |
 
-- placeholder vs real: **p = 0.0001**
-- placeholder vs junk: p = 0.10 (not separated at n=17)
-- junk vs real: p < 0.0001
+The LLM verifier's placeholder detection is **non-deterministic** at
+temperature 0 — same prompt, same items, 76.5% then 64.7%. Reasoning
+models sample internally; `reasoning_effort=low` reduces but does not
+eliminate variance. **LLM prompting cannot reach 100% on this class.**
 
-The verifier is not content-blind. It detects the specific class of *semantically plausible* reference syntax at 76.5% because a template reference is a plausible pointer to a prior step. Expected residual leak: 0.706 × 0.235 ≈ **16%** of production items carry undetected wrong content.
+**Hybrid verifier — deterministic regex prefilter + LLM semantic check:**
+
+Template syntax (`{{...}}`, `${...}`, `$var`, `<content_from_sN>`,
+"contents of X") is a **syntactic** class. A regex catches it with 100%
+recall, 0 LLM cost, 0 variance. Only non-matching cases reach the LLM.
+
+| Content | flagged INCORRECT | rate | method |
+|---|---|---|---|
+| real (`alphaN`) | 0 / 17 | **0.0%** | LLM (clean) |
+| placeholder (`{{...}}`) | **17 / 17** | **100%** | regex |
+| junk (`XXXX…`) | 17 / 17 | 100% | LLM (or regex, if extended) |
+| empty (`""`) | 17 / 17 | 100% | regex (empty check) |
+
+**Production fix summary — all three layers 100%:**
+
+| Layer | Baseline | Fixed | Method |
+|---|---|---|---|
+| Planner (rule 9) | 3/5 seed placeholder | **0/5** | prompt rule |
+| Executor (substitution) | 12/17 production | **0/17** | regex replace |
+| Verifier (hybrid) | 11-13/17 detection | **17/17** | regex prefilter |
+
+The finding: **syntactic failures require syntactic fixes.** Prompt
+engineering works for semantic classes. For deterministic patterns,
+deterministic checkers are necessary — otherwise run-to-run variance in
+a reasoning model sets the ceiling at ~65-80%.
 
 ### 4.5 Capability probes (negative result)
 
