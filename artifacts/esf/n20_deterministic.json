@@ -1,0 +1,682 @@
+[
+  {
+    "item": "n20-real-00",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-00",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in0_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-00",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 6 chars to answer.txt",
+        "wrote 6 chars to in0.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-00",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-01",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-01",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in1_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-01",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "alpha1",
+        "wrote 6 chars to answer.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-01",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-02",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-02",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in2_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-02",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 6 chars to answer.txt",
+        "wrote 6 chars to in2.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-02",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-03",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-03",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in3_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-03",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 6 chars to answer.txt",
+        "wrote 6 chars to in3.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-03",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-04",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-04",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in4_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-04",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 6 chars to answer.txt",
+        "alpha4"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-04",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-05",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-05",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in5_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-05",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 13 chars to answer.txt",
+        "seed-01-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-05",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-06",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-06",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in6_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-06",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-02-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-06",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-07",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-07",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in7_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-07",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-03-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-07",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-08",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-08",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in8_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-08",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "seed-04-content",
+        "wrote 17 chars to answer.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-08",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-09",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-09",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in9_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-09",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-05-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-09",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-10",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-10",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in10_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-10",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "seed-06-content",
+        "wrote 17 chars to answer.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-10",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-11",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-11",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in11_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-11",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "seed-07-content",
+        "wrote 17 chars to answer.txt"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-11",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-12",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-12",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in12_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-12",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-08-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-12",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-13",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-13",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in13_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-13",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-09-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-13",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-14",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-14",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in14_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-14",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-10-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-14",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-15",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-15",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in15_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-15",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-11-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-15",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-real-16",
+    "verdict": "CORRECT",
+    "reason": "ok",
+    "detail": {},
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-placeholder-16",
+    "verdict": "INCORRECT",
+    "reason": "template_syntax",
+    "detail": {
+      "path": "answer.txt",
+      "content": "{{read_in16_output}}"
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-junk-16",
+    "verdict": "INCORRECT",
+    "reason": "content_not_from_read",
+    "detail": {
+      "path": "answer.txt",
+      "content": "XXXXXXXXXXXXXXX",
+      "reads": [
+        "wrote 17 chars to answer.txt",
+        "seed-12-content"
+      ]
+    },
+    "source": "deterministic"
+  },
+  {
+    "item": "n20-empty-16",
+    "verdict": "INCORRECT",
+    "reason": "empty_content",
+    "detail": {
+      "path": "answer.txt"
+    },
+    "source": "deterministic"
+  }
+]

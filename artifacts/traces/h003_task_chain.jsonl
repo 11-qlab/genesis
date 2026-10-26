@@ -1,0 +1,20 @@
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-01", "class": "literal_or_other", "written": "hello world", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-02", "class": "placeholder", "written": "${s1.content}", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-03", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-04", "class": "placeholder", "written": "{{s1.result}}", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-05", "class": "literal_or_other", "written": "x", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-06", "class": "placeholder", "written": "${s2.output}", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-07", "class": "literal_or_other", "written": "summary", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-08", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-09", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "baseline", "item": "tc-10", "class": "literal_or_other", "written": "A", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-01", "class": "literal_or_other", "written": "hello world", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-02", "class": "placeholder", "written": "<content from s1>", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-03", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-04", "class": "literal_or_other", "written": "The sandbox note contains the following information: ...", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-05", "class": "literal_or_other", "written": "x", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-06", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-07", "class": "literal_or_other", "written": "summary", "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-08", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-09", "class": "no_plan", "written": null, "finish": "stop"}
+{"bench": "task_chain_10", "cond": "patched", "item": "tc-10", "class": "literal_or_other", "written": "A", "finish": "stop"}

@@ -1,0 +1,121 @@
+[
+  {
+    "item": "n20-placeholder-00",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 188,
+    "latency_s": 1.74
+  },
+  {
+    "item": "n20-placeholder-01",
+    "level": "L4",
+    "verdict": "CORRECT",
+    "reasoning_len": 248,
+    "latency_s": 1.63
+  },
+  {
+    "item": "n20-placeholder-02",
+    "level": "L4",
+    "verdict": "CORRECT",
+    "reasoning_len": 248,
+    "latency_s": 1.53
+  },
+  {
+    "item": "n20-placeholder-03",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 197,
+    "latency_s": 1.33
+  },
+  {
+    "item": "n20-placeholder-04",
+    "level": "L4",
+    "verdict": "CORRECT",
+    "reasoning_len": 144,
+    "latency_s": 1.23
+  },
+  {
+    "item": "n20-placeholder-05",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 294,
+    "latency_s": 1.7
+  },
+  {
+    "item": "n20-placeholder-06",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 219,
+    "latency_s": 1.58
+  },
+  {
+    "item": "n20-placeholder-07",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 215,
+    "latency_s": 1.36
+  },
+  {
+    "item": "n20-placeholder-08",
+    "level": "L4",
+    "verdict": "CORRECT",
+    "reasoning_len": 399,
+    "latency_s": 2.18
+  },
+  {
+    "item": "n20-placeholder-09",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 215,
+    "latency_s": 1.58
+  },
+  {
+    "item": "n20-placeholder-10",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 216,
+    "latency_s": 1.54
+  },
+  {
+    "item": "n20-placeholder-11",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 216,
+    "latency_s": 1.64
+  },
+  {
+    "item": "n20-placeholder-12",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 478,
+    "latency_s": 2.57
+  },
+  {
+    "item": "n20-placeholder-13",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 264,
+    "latency_s": 1.94
+  },
+  {
+    "item": "n20-placeholder-14",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 258,
+    "latency_s": 1.84
+  },
+  {
+    "item": "n20-placeholder-15",
+    "level": "L4",
+    "verdict": "INCORRECT",
+    "reasoning_len": 252,
+    "latency_s": 1.64
+  },
+  {
+    "item": "n20-placeholder-16",
+    "level": "L4",
+    "verdict": "CORRECT",
+    "reasoning_len": 342,
+    "latency_s": 2.36
+  }
+]
