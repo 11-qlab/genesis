@@ -8,7 +8,7 @@
       "disagree": [],
       "mcnemar_p": 1.0,
       "verdict": "PASS",
-      "test_interpretation": "68/68 agreement = perfect. No discordant pairs, no test needed. Hypothesis confirmed by construction, not by p-value. The BH p=1.0 in summary.json is a placeholder for 'no variance observed'; it does not mean 'test failed'.",
+      "test_interpretation": "68/68 agreement = perfect invariance. No discordant pairs, no test applicable. The p=1.0 in summary.json is a placeholder for 'no variance observed', not evidence of failure.",
       "not_a_test": true
     },
     {
@@ -92,29 +92,36 @@
       "verdict": "REJECTED",
       "rejection_analysis": {
         "verdict": "REJECTED",
-        "reason": "McNemar p=0.5, BF10=1.33 at n=10. Insufficient evidence that rule 9 reduces placeholder rate on task_chain.",
-        "raw_transitions": [
-          {
-            "item": "tc-04",
-            "from": "placeholder",
-            "to": "literal_or_other",
-            "patched_written": "The sandbox note contains the following information: ..."
-          },
-          {
-            "item": "tc-06",
-            "from": "placeholder",
-            "to": "no_plan",
-            "patched_written": null
-          }
-        ],
-        "interpretation": {
-          "real_improvements": 0,
+        "reason": "McNemar p=0.5, BF10=1.33 at n=10. Insufficient evidence.",
+        "transition_count": 2,
+        "classified": {
+          "real_fixes": 0,
           "syntax_shifts": 0,
           "form_shifts_new_failure_modes": 1,
           "plan_generation_failures": 1
         },
-        "key_finding": "The '2 improvements' in the paired count are misleading. Rule 9 does not reduce placeholder rate; it perturbs the failure into alternate forms: (a) syntax shift placeholder\u2192placeholder (tc-02: ${s1.content} \u2192 <content from s1>); (b) text deferral 'The sandbox note contains the following ...' (tc-04) which the current regex does not catch; (c) plan-generation failure, placeholder\u2192no_plan (tc-06). This is the 'syntax shift under constraint' pattern documented in \u00a75, now observed in a cross-tool-boundary family, with a new form class (text deferral) not present in fam14in.",
-        "paper_action": "The rejection is a result. It generalizes \u00a75: rule 9 shifts failure modes rather than eliminating them wherever the value must cross a tool boundary. Text deferral is a new observable class worth adding to the regex in verifier_deterministic.py."
+        "transitions": {
+          "syntax_shifts": [],
+          "form_shifts": [
+            {
+              "item": "tc-04",
+              "from": "placeholder",
+              "to": "literal_or_other",
+              "patched_written": "The sandbox note contains the following information: ..."
+            }
+          ],
+          "plan_failures": [
+            {
+              "item": "tc-06",
+              "from": "placeholder",
+              "to": "no_plan",
+              "patched_written": ""
+            }
+          ],
+          "real_fixes": []
+        },
+        "key_finding": "The paired improvements are failure-form shifts, not fixes. Rule 9 perturbs placeholder emission into: (a) syntax shift (placeholder\u2192placeholder); (b) text deferral (new class, not caught by regex); (c) plan-generation failure (placeholder\u2192no_plan). This generalizes \u00a75: rule 9 shifts failure forms under constraint rather than eliminating them wherever value must cross a tool boundary.",
+        "verifier_bug_exposed": "Text-deferral form 'The sandbox note contains the following ...' is not matched by TEMPLATE_RE in scripts/verifier_deterministic.py. This is a real gap in the deterministic verifier."
       }
     }
   ],
@@ -140,7 +147,7 @@
   ],
   "notes": {
     "H001": "Not a p-value test \u2014 perfect agreement, no discordant pairs.",
-    "H002": "p derived from binomial tail under weak null p_flip=0.1.",
-    "H003": "McNemar exact on 2 improvements, 0 regressions."
+    "H002": "p = binomial tail under weak null p_flip=0.1.",
+    "H003": "McNemar exact. Verdict REJECTED. Failure-form shift, not fix."
   }
 }
