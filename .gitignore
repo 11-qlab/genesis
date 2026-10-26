@@ -26,3 +26,4 @@ artifacts/mi_missing_20b.json
 genesis/
 .coverage
 .import_linter_cache/
+*.bak
