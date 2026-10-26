@@ -1,0 +1,19 @@
+{
+  "id": "H006",
+  "registered_utc": "2026-10-27T00:00:00Z",
+  "status": "prospective",
+  "claim": "A provenance-typed verifier (scripts/provenance_verifier.py) flags strictly more BINDING_MISSED trajectories than scripts/verifier_deterministic.py on the test bench, because the latter's string-equality rule passes trajectories where an upstream read exists but no substitution occurred.",
+  "operationalization": {
+    "input": "artifacts/traces/trace_test.jsonl",
+    "verifier_a": "scripts/verifier_deterministic.py",
+    "verifier_b": "scripts/provenance_verifier.py",
+    "metric": "count of tasks flagged FAIL by each, paired",
+    "test": "McNemar exact, alpha=0.05, two-sided",
+    "reject_if": "b_flags > a_flags with McNemar p < 0.05",
+    "accept_if": "a_flags >= b_flags OR McNemar p >= 0.05",
+    "stopping_rule": "single run, n = full test bench, no re-runs"
+  },
+  "cost_estimate": "0 LLM calls (both verifiers are deterministic)",
+  "committed_by": "self",
+  "note": "First hypothesis registered before execution. If it fails, the provenance verifier is not a contribution and should not appear as one."
+}
