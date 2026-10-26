@@ -14,8 +14,7 @@ to reason about it introduces variance that caps accuracy at ~65%.
 import argparse, json, re, sys
 from pathlib import Path
 
-TEMPLATE_RE = re.compile(
-    r"""
+_PATTERNS_V1 = r"""
     \{\{[^}]+\}\}                                     # {{anything}}
   | \$\{[^}]+\}                                       # ${anything}
   | \$\w+(\.\w+)*                                     # $var or $var.attr
@@ -28,7 +27,15 @@ TEMPLATE_RE = re.compile(
   | \bcontains?\s+the\s+following\b                     # "contains the following"
   | \bfollowing\s+(?:content|text|result|output)\b     # "following content"
   | \b(?:the|a|this|that)\s+(?:\w+\s+){0,4}(?:content|result|output)\b            # "the sandbox content"
-    """,
+    """
+_PATTERNS_V2 = _PATTERNS_V1 + r"""
+  | \bSummary of\b
+  | \[[^\]]*(?:content|value|output|result)[^\]]*\]
+  | \bcontent\s+(?:not |un)?available\b
+  | \b(?:value|contents?)\s+(?:unavailable|missing|unknown)\b
+"""
+TEMPLATE_RE = re.compile(_PATTERNS_V1, re.VERBOSE | re.IGNORECASE)
+TEMPLATE_RE_V2 = re.compile(_PATTERNS_V2, re.VERBOSE | re.IGNORECASE),
     re.VERBOSE | re.IGNORECASE,
 )
 
@@ -46,8 +53,10 @@ def extract_reads(traj):
         if s.get("observation") is not None
     }
 
-def verify(traj):
+def verify(traj, template_re=None):
     """Return (verdict, reason, detail)."""
+    if template_re is None:
+        template_re = TEMPLATE_RE
     all_obs = extract_reads(traj)
 
     for s in traj.get("steps", []):

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Hypothesis manifest",
+  "type": "object",
+  "required": ["id", "claim", "metric", "test", "status", "conditions"],
+  "properties": {
+    "id":             {"type": "string", "pattern": "^H[0-9]{3}$"},
+    "registered_at":  {"type": "string"},
+    "registered_after_observation": {"type": "boolean", "default": false},
+    "claim":          {"type": "string", "minLength": 10},
+    "metric":         {"type": "string"},
+    "direction":      {"enum": ["increase", "decrease", "no_degradation"]},
+    "test":           {"enum": ["mcnemar_exact", "binomial_tail", "bootstrap", "agreement"]},
+    "status":         {"enum": ["pending", "completed"]},
+    "conditions": {
+      "type": "object",
+      "required": ["a", "b"],
+      "properties": {
+        "a": {"type": "object", "properties": {"type": {"enum": ["verifier", "prompt"]}}},
+        "b": {"type": "object", "properties": {"type": {"enum": ["verifier", "prompt"]}}}
+      }
+    },
+    "bench":           {"type": "string"},
+    "n_items":         {"type": "integer"},
+    "accept_criterion":{"type": "string"},
+    "cost_llm_calls":  {"type": "integer"},
+    "result_file":     {"type": "string"},
+    "verdict":         {"enum": ["PASS", "REJECTED", "SCOPED", "INCONCLUSIVE", "NOT_A_TEST"]}
+  }
+}

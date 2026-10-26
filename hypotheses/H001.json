@@ -1,0 +1,20 @@
+{
+  "id": "H001",
+  "registered_at": "2026-10-26T21:00:00Z",
+  "registered_after_observation": true,
+  "claim": "Deterministic verifier returns identical verdicts when trajectory steps are reversed",
+  "metric": "varies",
+  "test": "varies",
+  "status": "completed",
+  "conditions": {
+    "a": {
+      "type": "recorded"
+    },
+    "b": {
+      "type": "recorded"
+    }
+  },
+  "result_file": "results/H001.json",
+  "verdict": "NOT_A_TEST",
+  "cost_llm_calls": 0
+}

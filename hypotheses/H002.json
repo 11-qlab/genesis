@@ -1,0 +1,20 @@
+{
+  "id": "H002",
+  "registered_at": "2026-10-26T21:00:00Z",
+  "registered_after_observation": true,
+  "claim": "LLM verifier at temperature 0 returns inconsistent verdicts across 3 runs on identical placeholder items",
+  "metric": "varies",
+  "test": "varies",
+  "status": "completed",
+  "conditions": {
+    "a": {
+      "type": "recorded"
+    },
+    "b": {
+      "type": "recorded"
+    }
+  },
+  "result_file": "results/H002.json",
+  "verdict": "PASS",
+  "cost_llm_calls": 0
+}

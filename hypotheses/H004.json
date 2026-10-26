@@ -1,0 +1,20 @@
+{
+  "id": "H004",
+  "registered_at": "2026-10-26T21:00:00Z",
+  "registered_after_observation": true,
+  "claim": "Rule 9 reduces placeholder rate on write-requiring benches, but placeholder is not the dominant failure class",
+  "metric": "placeholder_rate_plus_failure_class_distribution",
+  "test": "varies",
+  "status": "completed",
+  "conditions": {
+    "a": {
+      "type": "recorded"
+    },
+    "b": {
+      "type": "recorded"
+    }
+  },
+  "result_file": "results/H004.json",
+  "verdict": "SCOPED",
+  "cost_llm_calls": 60
+}

@@ -1,0 +1,20 @@
+{
+  "id": "H003",
+  "registered_at": "2026-10-26T21:00:00Z",
+  "registered_after_observation": true,
+  "claim": "Rule 9 (literal content) reduces placeholder rate on task_chain family",
+  "metric": "varies",
+  "test": "varies",
+  "status": "completed",
+  "conditions": {
+    "a": {
+      "type": "recorded"
+    },
+    "b": {
+      "type": "recorded"
+    }
+  },
+  "result_file": "results/H003.json",
+  "verdict": "REJECTED",
+  "cost_llm_calls": 0
+}
