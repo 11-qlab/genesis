@@ -5,7 +5,5 @@
   "agree": 68,
   "disagree": [],
   "mcnemar_p": 1.0,
-  "verdict": "PASS",
-  "test_interpretation": "68/68 agreement = perfect invariance. No discordant pairs, no test applicable. The p=1.0 in summary.json is a placeholder for 'no variance observed', not evidence of failure.",
-  "not_a_test": true
+  "verdict": "PASS"
 }

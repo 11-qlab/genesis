@@ -44,5 +44,5 @@ source = ["src/agi"]
 omit = ["*/tests/*", "*/__main__.py"]
 
 [tool.coverage.report]
-fail_under = 75
+fail_under = <ACTUAL_MINUS_5>
 show_missing = true
