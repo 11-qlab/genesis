@@ -1,0 +1,22 @@
+[importlinter]
+root_package = agi
+
+[importlinter:contract:no-core-to-outer]
+name = Core must not import outer layers
+type = forbidden
+source_modules =
+    agi.core
+forbidden_modules =
+    agi.agents
+    agi.reasoning
+    agi.evaluation
+    agi.cli
+
+[importlinter:contract:no-tools-to-agents]
+name = Tools must not import agents
+type = forbidden
+source_modules =
+    agi.tools
+forbidden_modules =
+    agi.agents
+    agi.reasoning
