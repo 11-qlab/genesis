@@ -1,5 +1,16 @@
 # AGI Platform
 
+## Papers
+
+- **[Two Layers of Template Failure in Tool-Using LLM Agents](docs/research/WORKSHOP_PAPER.md)**  
+  The 70.6% placeholder finding, the two-subproblem split, the three-layer fix, and the deterministic verifier at 100% on 4 content classes.
+
+- **[A Reproducible Hypothesis-Testing Loop for LLM Agent Research](docs/research/LOOP_PAPER.md)**  
+  Pre-registered hypotheses, McNemar + Bayes factors + BH correction, published rejections. 5 hypotheses; 2 pass, 2 reject, 1 scoped.
+
+---
+
+
 A modular, tested research platform for building and evaluating agentic AI
 systems. It is **not** an AGI. It is infrastructure for experiments that could
 eventually inform AGI research.
