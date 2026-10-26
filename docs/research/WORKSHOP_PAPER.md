@@ -106,6 +106,8 @@ Every placeholder was a well-formed string; `fs_write` returned success with a b
 
 *Non-literal* = `placeholder` + `wrong_value`. Baseline seed failures: 1 `${s2.output}` (placeholder) + 2 `$s2` (wrong_value, bare variable reference). Patched seed: 5/5 literal.
 
+**Typed-chain is the only bench outside fam14in where rule 9 reduces placeholder rate** (4/5 → 2/5, n=5). On error_recovery, compositional, and task_chain, the dominant failure class is not placeholder emission — it is plan absence (no fs_write step at all), which rule 9 does not touch because there is no content to substitute. See §7.
+
 **Test items are 10/10 non-literal in both conditions.** Under baseline, the model invents `${step1.output}` (10/10). Under the patched prompt, `${...}` is forbidden, so the model invents `<content_from_s1>` (10/10). The rate is unchanged; the syntax shifts.
 
 Placeholder syntax distribution, patched condition:
@@ -213,6 +215,16 @@ Accuracy tracks whether correctness is determined by content or by sequence, con
 The controlled split gives a clean two-class mechanism:
 
 **Class A (seed).** Value is in the goal at plan-time. The model *can* inline it (baseline 2/5 do), but 3/5 emit a reference — `${s2.output}` or `$s2`. The failure here is a *choice*: the model defers to a reference even when a literal is available. Rule 9 overrides the choice and yields 5/5 literal.
+
+**A third failure class emerged from cross-family.** On error_recovery
+item er-01, the patched prompt shifted `no_write_step` → `"Summary of
+config.txt: [content not available]"` — the model wrote what the file
+is *about* instead of what is *in* it. We call this **descriptive
+content**: a graceful deferral that names the required value rather
+than inlining it. Rule 9 does not prevent this; it appears to induce
+it, by forbidding explicit template syntax while leaving the model
+without the literal value. This is the same §5 mechanism — deferred
+value-passing — in a third notation.
 
 **Class B (test).** Value is only available after a prior `fs_read` returns. The model cannot inline it because it does not have it at plan-time. It emits a reference. Rule 9 forbids `$X` and `${...}`; the model obliges and invents `<content_from_s1>` — a different notation for the same deferral. The rate is unchanged because the *underlying problem* — the model has no literal to write — is unchanged.
 
