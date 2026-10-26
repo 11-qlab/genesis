@@ -43,3 +43,10 @@ for the length of the study. Coverage gate: `fail_under = 63`
   the reproducibility contract — `reproduce.sh` requires the caller to
   supply `AGI_BASE_URL`.
 - Reproduce into isolated dir: `ARTIFACTS_DIR=/tmp/repro_check ./reproduce.sh`.
+
+## Verification status (2026-10-27, Path B applied)
+
+- Controlled split (n=15) is committed and backed: seed 1/5 → 0/5 fail; test 10/10 → 10/10 fail.
+- Production rate 12/17 (70.6%) is cited in WORKSHOP_PAPER.md §4.1 but has no committed trace artifact; treated as historical.
+- Ground-truth asymmetry: seed bench records `expected`; test bench does not. Test-bench fail labels are harness-self-reported.
+- §7 limitation added to paper describing both.

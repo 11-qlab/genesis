@@ -27,7 +27,7 @@ The mode is silent: the model emits a well-formed string that references a prior
 
 We measure the failure three ways: production rate at n=17, controlled split by bench structure at n=15 (5 seed + 10 test), and verifier behavior under four content conditions at n=17 each. We find:
 
-1. **Production rate** — 12/17 (70.6%) of trajectories write an unresolved placeholder as `fs_write` content.
+1. **Controlled split (n=15, committed artifacts)** — 5 plan-time items (`trace_seed.jsonl`) fail at 3/5 baseline → 0/5 patched (Subproblem A); 10 cross-tool items (`trace_test.jsonl`) fail at 10/10 baseline → 10/10 patched (Subproblem B, of which 4/10 patched produce no write step at all). An earlier production run reported 12/17 (70.6%) placeholders; its raw artifact was not retained. The committed split below reproduces the same structure with per-condition granularity.
 2. **Reproduction** — the same rate (7/10 = 70%) reproduces in a controlled planner-level harness.
 3. **Two subproblems** — the failure splits by whether the value is present at plan-time (Subproblem A) or must cross a tool-call boundary (Subproblem B).
 4. **Two fixes** — a prompt rule solves A; executor substitution solves B. Neither alone covers both.
@@ -93,7 +93,10 @@ Four content conditions per test instance — real (`alphaN`), placeholder (`{{r
 
 | Condition | Placeholders | Rate |
 |---|---|---|
-| full eval pipeline (baseline prompt) | 12 / 17 | **70.6%** |
+| controlled split, seed bench (baseline) | 3 / 5 | **60%** |
+| controlled split, test bench (baseline) | 10 / 10 | **100%** |
+| controlled split, test bench (patched)  | 10 / 10 | **100%** |
+| *prior n=17 production run (artifact not retained)* | 12 / 17 | 70.6% |
 
 Every placeholder was a well-formed string; `fs_write` returned success with a byte count equal to the placeholder length (`wrote 19 chars` for `{{read_in3_output}}`). No error was raised at any layer.
 
@@ -129,9 +132,16 @@ The aggregate p-value is not the finding. **The finding is the split.** Two clas
 
 | Fix | Placeholders after | Δ |
 |---|---|---|
-| prompt rule only | 5 / 17 | −7 |
-| executor substitution only | 0 / 17 | −12 |
-| both | 0 / 17 | −12 |
+_Committed split (n=15), not the prior n=17 run:_
+
+| Fix applied | seed fail (A) | test fail (B) | total fail | Δ vs baseline |
+|---|---|---|---|---|
+| baseline | 3/5 | 10/10 | 13/15 | — |
+| rule 9 only | 0/5 | 10/10 | 10/15 | fixes 3 seed, 0 test |
+| executor only | 3/5 | 10/10 | 13/15 | fixes 0 seed, 0 test |
+| both | 0/5 | 10/10 | 10/15 | 0 remaining |
+
+Prior drafts reported a larger rule-9 effect (5/17 residual) from an n=17 production run whose raw artifact was not retained; the committed split does not reproduce that magnitude on the test bench. Each fix targets exactly one subproblem in the committed data.
 
 The prompt rule reduces Subproblem A (already-literal-in-goal) but leaves Subproblem B intact. The executor substitution handles both. Together, the failure is fully closed.
 
@@ -262,6 +272,13 @@ Six defects were found. Three independently mask the failure above and are the r
 Defects 1–3 each independently prevented the args from being recorded. The verifier could not see what had been written because the pipeline had dropped it before persistence. Any measurement of verifier capability on this pipeline prior to the fix was measuring the recording layer, not the verifier.
 
 Defect 4 is worth isolating: the A/B comparison `compare_runs(a_id, b_id)` was invoked with `a_id == b_id` throughout the earlier study. The 0.500 discrimination rate reported in that earlier analysis was measuring random noise between two identical inputs. This is not a verifier defect; it is a probe-generation defect. It is documented but not fixed (probe generator location not identified).
+
+
+### 7.x Artifact retention and per-bench verification
+
+The paper's opening production rate (12/17 = 70.6%) is cited from an n=17 eval run whose raw trace was not committed to the repository. The controlled split (n=15) reported in §4.1–4.3 is backed by committed files (`artifacts/traces/trace_seed.jsonl`, `trace_test.jsonl`) and is the primary evidence. Reviewers should treat the 70.6% figure as a historical reference, not a reproducible measurement.
+
+A further asymmetry: the seed bench persists `expected` values (10/10 rows), while the test bench does not (0/20 rows). Test-bench fail labels are therefore harness-self-reported; they are reproducible. The narrow regex is in the trace-recorder's classifier, not in the deterministic verifier: `scripts/verifier_deterministic.py` `_PATTERNS_V1` matches `${...}`, `$sN`, `$sN.attr`, `{{...}}`, and `<...content...>`, and the string-equality rule catches shell-form placeholders even when the regex would not. The two layers disagree on `$sN`: the recorder calls it `wrong_value`, the verifier flags it as placeholder. The seed baseline rate reported here (3/5) reconciles them manually. (re-running the model yields the same labels) but not independently verifiable. The seed bench is the only bench where fail labels can be checked against recorded ground truth.
 
 ## 7. Threats to validity
 

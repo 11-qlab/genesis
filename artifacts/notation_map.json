@@ -1,0 +1,18 @@
+{
+  "gpt-oss-20b": {
+    "notations": [],
+    "plan_excerpt": "1. fs_read(seed.txt)  \n2. fs_write(out.txt, <content>)"
+  },
+  "qwen2.5:14b": {
+    "notations": [],
+    "plan_excerpt": "1. fs_read(\"seed.txt\")  \n2. fs_write(\"out.txt\", <content>)"
+  },
+  "llama3.1:8b": {
+    "notations": [],
+    "plan_excerpt": "1. fs_read(\"seed.txt\")  \n2. fs_write(\"out.txt\", <content>)"
+  },
+  "deepseek-r1:14b": {
+    "notations": [],
+    "plan_excerpt": "1. fs_read(\"seed.txt\")  \n2. fs_write(\"out.txt\", <content>)"
+  }
+}

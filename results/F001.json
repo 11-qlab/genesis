@@ -1,0 +1,23 @@
+{
+  "id": "F001",
+  "claim": "The paper's headline production rate (12/17 = 70.6%) is cited in the text but not backed by any committed trace artifact. The controlled split (n=15) is fully backed and reproduces the same structure with per-condition detail. Additionally, ground-truth availability is asymmetric: seed bench records expected values, test bench does not.",
+  "sourced_in_paper": "WORKSHOP_PAPER.md lines 30, 96, 132-134, 179 (12/17 references)",
+  "committed_artifact_status": {
+    "17_line_trace_found": false,
+    "git_history_search": "no commit ever added a 17-line trace; only commit touching trace_test.jsonl is 93b7a09 (adds n=20)",
+    "prior_70_pct_commit_3857e17": "different measurement \u2014 verifier discrimination (fam14in 10/12, fam14out 4/8), not production rate"
+  },
+  "backed_claim": {
+    "seed_baseline": "3/5",
+    "seed_patched": "0/5",
+    "test_baseline": "10/10",
+    "test_patched": "10/10",
+    "seed_expected_recorded": "10/10",
+    "test_expected_recorded": "0/20"
+  },
+  "paper_action": "Path B applied: \u00a74.1 leads with controlled split, \u00a74.3 ablation rebuilt from committed data, \u00a77 limitation added on artifact retention + ground-truth asymmetry.",
+  "prior_errors_corrected": [
+    "First F001 claimed 70.6% unsourced in paper \u2014 WRONG, cited at WORKSHOP_PAPER.md:30,96. Only the artifact is missing.",
+    "Second F001 claimed 'all traces are flat outcome records' \u2014 WRONG, trace_seed/test have plan_raw."
+  ]
+}
