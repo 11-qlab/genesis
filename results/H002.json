@@ -59,5 +59,11 @@
       ]
     }
   ],
-  "verdict": "PASS"
+  "verdict": "PASS",
+  "p_value_derivation": {
+    "h0_strong": "p_flip=0; any flip rejects at p<1e-6",
+    "h0_weak": "p_flip=0.1; binomial tail P(X>=7|n=17) = 7.84e-04",
+    "reported_p": 0.0007837561871795806
+  },
+  "reported_p": 0.00078376
 }

@@ -5,5 +5,7 @@
   "agree": 68,
   "disagree": [],
   "mcnemar_p": 1.0,
-  "verdict": "PASS"
+  "verdict": "PASS",
+  "test_interpretation": "68/68 agreement = perfect. No discordant pairs, no test needed. Hypothesis confirmed by construction, not by p-value. The BH p=1.0 in summary.json is a placeholder for 'no variance observed'; it does not mean 'test failed'.",
+  "not_a_test": true
 }

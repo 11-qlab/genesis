@@ -7,5 +7,31 @@
   "regressions": 0,
   "mcnemar_p": 0.5,
   "bf10": 1.3326666666666667,
-  "verdict": "REJECTED"
+  "verdict": "REJECTED",
+  "rejection_analysis": {
+    "verdict": "REJECTED",
+    "reason": "McNemar p=0.5, BF10=1.33 at n=10. Insufficient evidence that rule 9 reduces placeholder rate on task_chain.",
+    "raw_transitions": [
+      {
+        "item": "tc-04",
+        "from": "placeholder",
+        "to": "literal_or_other",
+        "patched_written": "The sandbox note contains the following information: ..."
+      },
+      {
+        "item": "tc-06",
+        "from": "placeholder",
+        "to": "no_plan",
+        "patched_written": null
+      }
+    ],
+    "interpretation": {
+      "real_improvements": 0,
+      "syntax_shifts": 0,
+      "form_shifts_new_failure_modes": 1,
+      "plan_generation_failures": 1
+    },
+    "key_finding": "The '2 improvements' in the paired count are misleading. Rule 9 does not reduce placeholder rate; it perturbs the failure into alternate forms: (a) syntax shift placeholder\u2192placeholder (tc-02: ${s1.content} \u2192 <content from s1>); (b) text deferral 'The sandbox note contains the following ...' (tc-04) which the current regex does not catch; (c) plan-generation failure, placeholder\u2192no_plan (tc-06). This is the 'syntax shift under constraint' pattern documented in \u00a75, now observed in a cross-tool-boundary family, with a new form class (text deferral) not present in fam14in.",
+    "paper_action": "The rejection is a result. It generalizes \u00a75: rule 9 shifts failure modes rather than eliminating them wherever the value must cross a tool boundary. Text deferral is a new observable class worth adding to the regex in verifier_deterministic.py."
+  }
 }
