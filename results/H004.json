@@ -1,0 +1,20 @@
+{
+  "id": "H004",
+  "registered_at": "2026-10-26T23:00:00Z",
+  "registered_after_observation": true,
+  "claim": "Rule 9 reduces placeholder rate on write-requiring benches, but placeholder is not the dominant failure class across the benchmark suite",
+  "metric": "placeholder_rate_plus_failure_class_distribution",
+  "benches": ["task_chain", "error_recovery", "compositional", "typed_chain"],
+  "n_items": 20,
+  "findings": {
+    "placeholder_baseline": "7/20 (35%)",
+    "placeholder_patched": "5/20 (25%)",
+    "no_plan_baseline": "7/20 (35%)",
+    "no_plan_patched": "8/20 (40%)",
+    "no_plan_refined_after_classifier": "PENDING re-run with refined classifier"
+  },
+  "verdict": "SCOPED",
+  "claim_after": "The three-layer fix addresses content-substitution failures (placeholder emission) where they occur — fam14in (70.6% → 0%) and typed_chain (80% → 40%). On benches where the dominant failure is plan absence or invalid plan output (error_recovery, compositional, task_chain), rule 9 does not apply because the failure is upstream of content substitution.",
+  "paper_action": "§4.2 should be scoped to 'content-substitution failures.' §7 threats should add: 'rule 9 does not address planning failures; on 3 of 4 write-requiring benches, the dominant failure class is not placeholder emission.'",
+  "cost_llm_calls": 60
+}

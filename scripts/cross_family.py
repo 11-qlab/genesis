@@ -54,17 +54,21 @@ def run_bench(bench_path, n_items, client, model):
                 finish = r.choices[0].finish_reason
             except Exception as e:
                 content, finish = "", f"ERR:{e}"
-            cls, written = "no_plan", None
-            try:
-                payload = extract_json_object(content)
-                steps = payload.get("steps") or ([payload] if "tool" in payload else [])
-                for s in steps:
-                    if isinstance(s, dict) and s.get("tool") == "fs_write":
-                        written = (s.get("args") or {}).get("content")
-                        cls = classify(written)
-                        break
-            except Exception:
-                pass
+            cls, written = "no_json", None
+            if content.strip():
+                try:
+                    payload = extract_json_object(content)
+                    steps = payload.get("steps") or ([payload] if "tool" in payload else [])
+                    cls = "no_write_step"
+                    for s in steps:
+                        if isinstance(s, dict) and s.get("tool") == "fs_write":
+                            written = (s.get("args") or {}).get("content")
+                            cls = classify(written)
+                            break
+                except Exception:
+                    cls = "no_json"
+            else:
+                cls = "no_output"
             rows.append({"bench": Path(bench_path).stem, "cond": cond, "item": it.get("id"),
                          "class": cls, "written": written, "finish": finish})
             print(f"  [{cond:8}] {it.get('id','?'):<20} {cls:<18} written={str(written)[:40]!r}")

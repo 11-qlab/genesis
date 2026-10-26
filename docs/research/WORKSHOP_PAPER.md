@@ -249,7 +249,17 @@ Defect 4 is worth isolating: the A/B comparison `compare_runs(a_id, b_id)` was i
 - **Single task family** (`fam14in`) for the fix. Section 4.6 provides cross-family context but not cross-family intervention.
 - **Self-verification confound.** The verifier is the same model family as the planner.
 - **Heuristic labels.** Placeholder classification is regex-based, validated by manual inspection of all outputs, not by independent annotators.
-- **Prompt rule is brittle.** One rule in one template. Sensitivity to wording (paraphrases, ordering, removal of one clause) is unmeasured. In repeated runs on the 5 seed instances, we observed between 2/5 and 5/5 literal content under the same baseline prompt at temperature 0 — a variance of 3 items on a 5-item task. The deterministic verifier does not have this variance.
+- **The three-layer fix addresses content-substitution failures specifically.**
+On 4 write-requiring benches (task_chain, error_recovery, compositional,
+typed_chain, n=20), placeholder rate drops from 7/20 (35%) baseline to
+5/20 (25%) patched, but the *dominant* failure class is plan absence,
+not placeholder emission: 7/20 (35%) baseline, 8/20 (40%) patched.
+Rule 9 does not reduce plan-absence failures because they occur upstream
+of content substitution — the model does not produce a valid plan at all.
+The fix in this paper is scoped to content-verification; it is not a
+general agent-capability improvement.
+
+**Prompt rule is brittle.** One rule in one template. Sensitivity to wording (paraphrases, ordering, removal of one clause) is unmeasured. In repeated runs on the 5 seed instances, we observed between 2/5 and 5/5 literal content under the same baseline prompt at temperature 0 — a variance of 3 items on a 5-item task. The deterministic verifier does not have this variance.
 - **The `<content_from_s1>` syntax may not appear in other models.** If the same prompt is given to a model that responds with a different escape notation, Subproblem B may manifest in a third form. The mechanism is generic; the specific notation is model-dependent.
 
 ## 8. Conclusion
