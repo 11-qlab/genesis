@@ -16,13 +16,18 @@ from pathlib import Path
 
 TEMPLATE_RE = re.compile(
     r"""
-    \{\{[^}]+\}\}                                    # {{anything}}
-  | \$\{[^}]+\}                                      # ${anything}
+    \{\{[^}]+\}\}                                     # {{anything}}
+  | \$\{[^}]+\}                                       # ${anything}
   | \$\w+(\.\w+)*                                     # $var or $var.attr
-  | <[^>]*(?:content|output|result|step|count)[^>]*>  # <content_from_sN>
-  | \bcontents?\s+of\s+\S+                            # "contents of X"
-  | \bthe\s+contents\b                                # "the contents"
-  | \bsame\s+as\s+\S+                                 # "same as X"
+  | \{[^{}\s]+\}                                       # {count}, {name} (single-brace)
+  | <[^>]*(?:content|output|result|step|count)[^>]*>    # <content_from_s1>
+  | \bcontents?\s+of\s+\S+                             # "contents of X"
+  | \bthe\s+contents\b                                  # "the contents"
+  | \bsame\s+as\s+\S+                                   # "same as X"
+  | \b(?:the|a|this|that)\s+(?:\w+\s+){0,4}(?:contains?|has|shows?|includes?)\b   # "the note contains"
+  | \bcontains?\s+the\s+following\b                     # "contains the following"
+  | \bfollowing\s+(?:content|text|result|output)\b     # "following content"
+  | \b(?:the|a|this|that)\s+(?:\w+\s+){0,4}(?:content|result|output)\b            # "the sandbox content"
     """,
     re.VERBOSE | re.IGNORECASE,
 )
