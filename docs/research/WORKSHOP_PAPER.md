@@ -15,7 +15,7 @@ We split the failure by bench structure and find two independent subproblems:
 - **Subproblem A — value present at plan-time but not inlined.** When the goal states the literal value (`write in0.txt='alpha0'`), baseline placeholders occur in 3/5 items; a single prompt rule requiring literal content eliminates the class (0/5).
 - **Subproblem B — value requires cross-tool substitution.** When the goal references a prior tool call's output (`read seed.txt and write its contents`), placeholder rate is 10/10 in both baseline and patched conditions. The prompt rule does not reduce the rate; it **changes the notation** from `${step1.output}` to `<content_from_s1>`. Only executor-side substitution closes this class (12/17 → 0/17 in production).
 
-The failure is structural (deferred value-passing across tool-call boundaries), not syntactic. A verifier given full arguments detects placeholders at 76.5% under a baseline prompt; adding one rule requiring template syntax to be flagged INCORRECT raises detection to 100% (17/17) with 0% false positives on correct content. The verifier fix mirrors the planner fix in structure — one specification rule closes the class. We also report six recording-layer defects found in the same harness, three of which independently masked the failure, and single-turn capability probes (30/30) that rule out token-level deficits.
+The failure is structural (deferred value-passing across tool-call boundaries), not syntactic. An LLM-based verifier given full arguments shows run-to-run variance at temperature 0 (64.7%–100% placeholder recall; 5.9%–58.8% false positive on correct content) because internal reasoning samples. Content verification is a string-equality problem, not a semantic one: `fs_write.content` must equal the preceding `fs_read.observation`. A deterministic verifier (regex prefilter + string equality) reaches 100% on all four content classes — correct (0/17 flagged), placeholder (17/17 caught), junk (17/17), empty (17/17) — with zero LLM calls. We also report six recording-layer defects found in the same harness, three of which independently masked the failure, and single-turn capability probes (30/30) that rule out token-level deficits.
 
 ---
 
@@ -133,47 +133,63 @@ The aggregate p-value is not the finding. **The finding is the split.** Two clas
 
 The prompt rule reduces Subproblem A (already-literal-in-goal) but leaves Subproblem B intact. The executor substitution handles both. Together, the failure is fully closed.
 
-### 4.4 Verifier behaviour — LLM alone vs. hybrid (n=17 each)
+### 4.4 Verifier behaviour — semantic vs. deterministic (n=17 each)
 
-**LLM alone (baseline prompt), repeated runs at temperature 0:**
+**LLM-based verifier, repeated runs at temperature 0:**
 
-| Content | run 1 | run 2 | variance |
+| Content | run 1 | run 2 | run 3 |
 |---|---|---|---|
-| real (`alphaN`) | 1/17 (5.9%) | 1/17 (5.9%) | 0 |
-| placeholder (`{{...}}`) | **13/17 (76.5%)** | **11/17 (64.7%)** | **±11.8pp** |
-| junk (`XXXX…`) | 17/17 (100%) | 17/17 (100%) | 0 |
-| empty (`""`) | 17/17 (100%) | 17/17 (100%) | 0 |
+| real (`alphaN`) | 1/17 flagged | 1/17 | **10/17 flagged** |
+| placeholder | 13/17 caught | 11/17 | 17/17 (with regex prefilter) |
+| junk | 17/17 | 17/17 | 17/17 |
+| empty | 17/17 | 17/17 | 17/17 |
 
-The LLM verifier's placeholder detection is **non-deterministic** at
-temperature 0 — same prompt, same items, 76.5% then 64.7%. Reasoning
-models sample internally; `reasoning_effort=low` reduces but does not
-eliminate variance. **LLM prompting cannot reach 100% on this class.**
+The LLM alone is non-deterministic on both axes: it can miss
+placeholders (64.7%–76.5% across runs) or over-flag correct content
+(5.9%–58.8% false positive across runs). It cannot reach 100% on
+either axis because internal reasoning samples.
 
-**Hybrid verifier — deterministic regex prefilter + LLM semantic check:**
+**Deterministic verifier — no LLM calls, string equality only:**
 
-Template syntax (`{{...}}`, `${...}`, `$var`, `<content_from_sN>`,
-"contents of X") is a **syntactic** class. A regex catches it with 100%
-recall, 0 LLM cost, 0 variance. Only non-matching cases reach the LLM.
+Content verification is not a semantic problem. The rule is:
+`fs_write.content == fs_read.observation`. Anything else is wrong.
+Three syntactic checks cover all tested classes:
 
-| Content | flagged INCORRECT | rate | method |
+1. Empty content → INCORRECT
+2. Template/placeholder syntax (regex) → INCORRECT
+3. Content does not equal any prior `fs_read` observation → INCORRECT
+4. Otherwise → CORRECT
+
+| Content | flagged INCORRECT | rate | reason |
 |---|---|---|---|
-| real (`alphaN`) | 0 / 17 | **0.0%** | LLM (clean) |
-| placeholder (`{{...}}`) | **17 / 17** | **100%** | regex |
-| junk (`XXXX…`) | 17 / 17 | 100% | LLM (or regex, if extended) |
-| empty (`""`) | 17 / 17 | 100% | regex (empty check) |
+| real (`alphaN`) | 0 / 17 | **0.0%** | matches fs_read |
+| placeholder (`{{...}}`) | **17 / 17** | **100%** | template regex |
+| junk (`XXXX…`) | **17 / 17** | **100%** | ≠ any read |
+| empty (`""`) | **17 / 17** | **100%** | empty check |
 
-**Production fix summary — all three layers 100%:**
+**All four classes at 100%. 0 LLM calls. 0 ms latency. 0 variance.**
+
+**Production fix summary — three layers, all deterministic:**
 
 | Layer | Baseline | Fixed | Method |
 |---|---|---|---|
-| Planner (rule 9) | 3/5 seed placeholder | **0/5** | prompt rule |
-| Executor (substitution) | 12/17 production | **0/17** | regex replace |
-| Verifier (hybrid) | 11-13/17 detection | **17/17** | regex prefilter |
+| Planner | 12/17 emit placeholder | 5–12/17 (variance) | rule 9 — helps Class A only |
+| Executor | 12/17 written wrong | **0/17** | regex substitution pass |
+| Verifier | 11–13/17 detection, 1–10/17 FP | **17/17 detection, 0/17 FP** | deterministic |
 
-The finding: **syntactic failures require syntactic fixes.** Prompt
-engineering works for semantic classes. For deterministic patterns,
-deterministic checkers are necessary — otherwise run-to-run variance in
-a reasoning model sets the ceiling at ~65-80%.
+**The finding.** Content verification is a **string equality** problem,
+not a semantic reasoning problem. Treating it as semantic (LLM-based)
+introduces variance on both axes: the same prompt at temperature 0
+gives 64.7% to 100% recall and 5.9% to 58.8% false positive across
+runs. Treating it as syntactic (deterministic regex + equality)
+reaches **100% on both axes with zero LLM cost**.
+
+Prompt engineering helps for value-in-goal cases (Class A) but is
+non-deterministic. Deterministic checking is required for anything
+with a well-defined correctness predicate — which content verification
+is. The three-layer fix (planner rule, executor substitution,
+deterministic verifier) achieves 100% where every layer alone caps out
+below it.
 
 ### 4.5 Capability probes (negative result)
 
