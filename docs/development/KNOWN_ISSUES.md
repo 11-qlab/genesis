@@ -46,7 +46,7 @@
 - `tests/integration/test_cli.py` shells out to `python -m agi`. It is slower
   than the rest (subprocess startup ~150 ms/test), but it is the only test that
   proves the console entry point works from a clean environment.
-- No coverage gate. `pytest --cov` is available if wanted; the current suite
+- Coverage gate: fail_under=63 (measured 68.73%) [fixed in bf799c0]. `pytest --cov` is available if wanted; the current suite
   focuses on branch-relevant behavior rather than lines.
 
 ## Deferred by policy (not bugs)
@@ -153,3 +153,23 @@ tiny state spaces and says nothing about deep world models. The T6
 learning curve (in `docs/research/T6_WORLD_MODEL_RESULTS.md`) is a clean
 measurement of *this* toy, not of world models in general.
 
+
+
+## Recording-layer defects (added 2026-10-27)
+
+Six defects found during the paper audit. Three independently masked the
+placeholder failure — a trajectory with dropped tool arguments looks
+sequence-correct.
+
+| # | Defect | Fixed |
+|---|---|---|
+| 1 | tool args dropped before persistence | yes |
+| 2 | observation truncated at 32 chars | yes |
+| 3 | write content not persisted | yes |
+| 4 | A/B probe paired item with itself (0.500 was noise) | yes |
+| 5 | read/write target alias collapse | no |
+| 6 | truncation at JSONL boundary drops step | no |
+
+Defects 1–3 are the reason earlier verifier measurements measured the
+recording layer, not the verifier. See `scripts/masking_ablation.py` for
+the per-defect sensitivity measurement.
