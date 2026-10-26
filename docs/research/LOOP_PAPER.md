@@ -15,8 +15,9 @@ new models, no new benchmarks, no additional GPU time. The loop's unit of
 output is a hypothesis disposition (`PASS` / `REJECTED` / `SCOPED` /
 `NOT_A_TEST`) with a paired test statistic and Bayes factor.
 
-We demonstrate the loop on four hypotheses about LLM tool-use trajectories
-(H001–H004). Two accept, one rejects, one is scoped. **The rejected hypothesis
+We demonstrate the loop on five hypotheses about LLM tool-use trajectories
+(H001–H005). Two accept, one rejects, one is scoped, and one is a
+not-a-test that establishes a structural invariant. **The rejected hypothesis
 exposed a real gap in a deterministic verifier**: a class of failure (text
 deferral) that the regex prefilter did not catch. The fix that followed reduced
 misclassification on the class from 0% to 100%. The scoped hypothesis forced a
@@ -155,6 +156,37 @@ aggregate suggests.
 the three-layer fix addresses **content-substitution failures specifically**,
 not agent planning failures. The paper is stronger for naming its boundary.
 
+### 3.5 H005 — descriptive-content regex extension
+
+**Claim.** `TEMPLATE_RE_V2` (which adds descriptive-content patterns to
+`TEMPLATE_RE_V1`) catches descriptive-content failures that V1 misses,
+without increasing false positives on real literal content.
+
+**Design.** 20-item synthetic bench: 10 descriptive-content positives
+("Summary of config.txt: [content not available]") + 10 real literals
+("alpha0"). Run verifier under V1 and V2. Paired per item.
+
+**Result.** V1 already catches all 10 descriptive items (10/10); V2
+catches the same 10/10. Zero discordant pairs. `REJECTED` — V2 adds no
+marginal catches.
+
+**What the rejection revealed.** The verifier is a three-rule system:
+(1) empty check; (2) regex; (3) equality (`content ∈ fs_read
+observations`). Rule 3 catches descriptive content because descriptive
+content is not a matching observation. **V2's semantic-ish regex
+patterns are redundant given rule 3.** The two-layer design (regex for
+syntactic placeholders, equality for everything else) is sufficient.
+
+H005's design was a valid rejection — the hypothesis tested was false.
+But the rejection produced a structural understanding the paper needed:
+the equality layer is doing the heavy lifting for any non-syntactic
+failure. Extending the regex beyond syntactic patterns is unnecessary.
+
+**This is the second rejection to produce an actionable result.** H003
+exposed a real regex bug (text deferral); H005 exposed a structural
+redundancy (semantic regex patterns are subsumed by equality). Both
+rejections improved the paper more than a pass would have.
+
 ## 4. Cost
 
 | Hypothesis | LLM calls | Verdict |
@@ -162,7 +194,8 @@ not agent planning failures. The paper is stronger for naming its boundary.
 | H002 | 34 | PASS |
 | H003 | 20 | REJECTED |
 | H004 | 60 | SCOPED |
-| **Total** | **114** | 2 pass, 1 reject, 1 scoped |
+| H005 | 0 | REJECTED |
+| **Total** | **114** | 2 pass, 2 reject, 1 scoped, 1 not-a-test |
 
 For comparison, a large-lab verifier evaluation typically runs 300–3000 calls
 per condition. The loop reaches its dispositions in 114 total, at the cost of

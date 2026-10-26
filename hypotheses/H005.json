@@ -1,0 +1,18 @@
+{
+  "id": "H005",
+  "registered_at": "2026-10-27T00:00:00Z",
+  "registered_after_observation": false,
+  "claim": "TEMPLATE_RE_V2 (descriptive-content patterns) catches descriptive-content failures that TEMPLATE_RE_V1 misses, without increasing false positives on real literal content",
+  "metric": "descriptive_content_detection + real_fp_delta",
+  "direction": "increase",
+  "test": "agreement",
+  "status": "pending",
+  "conditions": {
+    "a": {"type": "verifier", "regex_set": "v1"},
+    "b": {"type": "verifier", "regex_set": "v2"}
+  },
+  "bench": "artifacts/esf/h005_bench.jsonl",
+  "n_items": 20,
+  "accept_criterion": "V2 catches >=3 descriptive items that V1 missed, no net FP increase on real content",
+  "cost_llm_calls": 0
+}

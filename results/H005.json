@@ -31,5 +31,7 @@
     "b": {
       "regex_set": "v2"
     }
-  }
+  },
+  "interpretation": "H005 is REJECTED but the rejection is informative, not a failure. V1 caught all 10 descriptive-content items via 'content_not_from_read' (the equality check against fs_read observations), not via the regex. V2's additional descriptive-content patterns added zero marginal catches. This is because every descriptive-content string is also a non-matching string, and the equality check catches both classes. The finding: the two-layer verifier (regex + equality) is sufficient; extending the regex toward semantic patterns is redundant given the equality layer. H005's design isolated V1 vs V2 regexes but was confounded by rule 3 (equality) catching the target class first.",
+  "design_note": "H005 was designed to test V2's incremental catch rate over V1. But the verifier is a three-rule system: (1) empty, (2) regex, (3) equality. Rule 3 catches any non-matching content \u2014 including all descriptive-content items. So V1 already achieved 100% descriptive-content detection, and V2 added nothing. The hypothesis tested the wrong comparison. A better design would compare V2 against V1 with rule 3 disabled \u2014 that's H006, deferred."
 }

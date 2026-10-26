@@ -216,6 +216,15 @@ The controlled split gives a clean two-class mechanism:
 
 **Class A (seed).** Value is in the goal at plan-time. The model *can* inline it (baseline 2/5 do), but 3/5 emit a reference — `${s2.output}` or `$s2`. The failure here is a *choice*: the model defers to a reference even when a literal is available. Rule 9 overrides the choice and yields 5/5 literal.
 
+**Verification is three rules, not two.** The deterministic verifier
+applies: (1) empty-content check; (2) regex prefilter; (3) equality
+check (`content in prior fs_read observations`). H005 tested whether
+extending the regex (V2) catches descriptive-content items that V1
+misses. It does not — V1 already catches them via rule 3, because
+descriptive content is also non-matching content. The two-layer design
+(regex for syntactic placeholders, equality for everything else) is
+sufficient; extending the regex toward semantic patterns is redundant.
+
 **A third failure class emerged from cross-family.** On error_recovery
 item er-01, the patched prompt shifted `no_write_step` → `"Summary of
 config.txt: [content not available]"` — the model wrote what the file
