@@ -1,0 +1,35 @@
+{
+  "id": "H005",
+  "completed_at": "2026-10-26T22:15:25.648490Z",
+  "verdict": "REJECTED",
+  "per_class": {
+    "dc": {
+      "n": 10,
+      "a_incorrect": 10,
+      "b_incorrect": 10,
+      "a2b": 0,
+      "b2a": 0
+    },
+    "real": {
+      "n": 10,
+      "a_incorrect": 0,
+      "b_incorrect": 0,
+      "a2b": 0,
+      "b2a": 0
+    }
+  },
+  "mcnemar_p_descriptive": 1.0,
+  "bf_mcnemar_descriptive": 1.0,
+  "fp_delta_on_real": 0,
+  "criterion": "V2 catches >=3 descriptive items that V1 missed, no net FP increase on real content",
+  "criterion_met": false,
+  "design": "artifacts/esf/h005_bench.jsonl",
+  "conditions": {
+    "a": {
+      "regex_set": "v1"
+    },
+    "b": {
+      "regex_set": "v2"
+    }
+  }
+}

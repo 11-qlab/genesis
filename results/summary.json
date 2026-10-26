@@ -7,9 +7,7 @@
       "agree": 68,
       "disagree": [],
       "mcnemar_p": 1.0,
-      "verdict": "PASS",
-      "test_interpretation": "68/68 agreement = perfect invariance. No discordant pairs, no test applicable. The p=1.0 in summary.json is a placeholder for 'no variance observed', not evidence of failure.",
-      "not_a_test": true
+      "verdict": "PASS"
     },
     {
       "id": "H002",
@@ -123,31 +121,103 @@
         "key_finding": "The paired improvements are failure-form shifts, not fixes. Rule 9 perturbs placeholder emission into: (a) syntax shift (placeholder\u2192placeholder); (b) text deferral (new class, not caught by regex); (c) plan-generation failure (placeholder\u2192no_plan). This generalizes \u00a75: rule 9 shifts failure forms under constraint rather than eliminating them wherever value must cross a tool boundary.",
         "verifier_bug_exposed": "Text-deferral form 'The sandbox note contains the following ...' is not matched by TEMPLATE_RE in scripts/verifier_deterministic.py. This is a real gap in the deterministic verifier."
       }
+    },
+    {
+      "id": "H004",
+      "registered_at": "2026-10-26T23:00:00Z",
+      "registered_after_observation": true,
+      "claim": "Rule 9 reduces placeholder rate on write-requiring benches, but placeholder is not the dominant failure class across the benchmark suite",
+      "metric": "placeholder_rate_plus_failure_class_distribution",
+      "benches": [
+        "task_chain",
+        "error_recovery",
+        "compositional",
+        "typed_chain"
+      ],
+      "n_items": 20,
+      "findings": {
+        "placeholder_baseline": "7/20 (35%)",
+        "placeholder_patched": "5/20 (25%)",
+        "no_plan_baseline": "7/20 (35%)",
+        "no_plan_patched": "8/20 (40%)",
+        "no_plan_refined_after_classifier": "PENDING re-run with refined classifier"
+      },
+      "verdict": "SCOPED",
+      "claim_after": "The three-layer fix addresses content-substitution failures (placeholder emission) where they occur \u2014 fam14in (70.6% \u2192 0%) and typed_chain (80% \u2192 40%). On benches where the dominant failure is plan absence or invalid plan output (error_recovery, compositional, task_chain), rule 9 does not apply because the failure is upstream of content substitution.",
+      "paper_action": "\u00a74.2 should be scoped to 'content-substitution failures.' \u00a77 threats should add: 'rule 9 does not address planning failures; on 3 of 4 write-requiring benches, the dominant failure class is not placeholder emission.'",
+      "cost_llm_calls": 60
+    },
+    {
+      "id": "H005",
+      "completed_at": "2026-10-26T22:15:25.648490Z",
+      "verdict": "REJECTED",
+      "per_class": {
+        "dc": {
+          "n": 10,
+          "a_incorrect": 10,
+          "b_incorrect": 10,
+          "a2b": 0,
+          "b2a": 0
+        },
+        "real": {
+          "n": 10,
+          "a_incorrect": 0,
+          "b_incorrect": 0,
+          "a2b": 0,
+          "b2a": 0
+        }
+      },
+      "mcnemar_p_descriptive": 1.0,
+      "bf_mcnemar_descriptive": 1.0,
+      "fp_delta_on_real": 0,
+      "criterion": "V2 catches >=3 descriptive items that V1 missed, no net FP increase on real content",
+      "criterion_met": false,
+      "design": "artifacts/esf/h005_bench.jsonl",
+      "conditions": {
+        "a": {
+          "regex_set": "v1"
+        },
+        "b": {
+          "regex_set": "v2"
+        }
+      }
     }
   ],
   "bh_correction": [
     {
-      "id": "H002",
+      "index": 1,
       "p": 0.00078376,
-      "threshold": 0.016666666666666666,
+      "rank": 1,
+      "threshold": 0.010000000000000002,
       "reject_null": true
     },
     {
-      "id": "H003",
+      "index": 2,
       "p": 0.5,
-      "threshold": 0.03333333333333333,
+      "rank": 2,
+      "threshold": 0.020000000000000004,
       "reject_null": false
     },
     {
-      "id": "H001",
+      "index": 0,
       "p": 1.0,
+      "rank": 3,
+      "threshold": 0.03,
+      "reject_null": false
+    },
+    {
+      "index": 3,
+      "p": 1.0,
+      "rank": 4,
+      "threshold": 0.04000000000000001,
+      "reject_null": false
+    },
+    {
+      "index": 4,
+      "p": 1.0,
+      "rank": 5,
       "threshold": 0.05,
       "reject_null": false
     }
-  ],
-  "notes": {
-    "H001": "Not a p-value test \u2014 perfect agreement, no discordant pairs.",
-    "H002": "p = binomial tail under weak null p_flip=0.1.",
-    "H003": "McNemar exact. Verdict REJECTED. Failure-form shift, not fix."
-  }
+  ]
 }
