@@ -28,20 +28,22 @@ TEMPLATE_RE = re.compile(
 )
 
 def extract_reads(traj):
-    """Return {path: observation} for every fs_read with an observation."""
-    reads = {}
-    for s in traj.get("steps", []):
-        tc = s.get("tool_call") or {}
-        obs = s.get("observation")
-        if tc.get("name") == "fs_read" and obs is not None:
-            path = (tc.get("args") or {}).get("path", "")
-            reads[path] = str(obs)
-    return reads
+    """Return all tool observations from the trajectory.
+
+    Trajectories are rendered with tool_call on one step and observation
+    on the next step. Collect every observation-bearing step regardless of
+    which call preceded it — a write's content must match *some* prior
+    observation, otherwise the value was not resolved from a read.
+    """
+    return {
+        str(s.get("observation"))
+        for s in traj.get("steps", [])
+        if s.get("observation") is not None
+    }
 
 def verify(traj):
     """Return (verdict, reason, detail)."""
-    reads = extract_reads(traj)
-    all_obs = set(reads.values())
+    all_obs = extract_reads(traj)
 
     for s in traj.get("steps", []):
         tc = s.get("tool_call") or {}

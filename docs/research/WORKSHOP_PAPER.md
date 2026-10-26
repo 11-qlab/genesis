@@ -135,29 +135,30 @@ The prompt rule reduces Subproblem A (already-literal-in-goal) but leaves Subpro
 
 ### 4.4 Verifier behaviour — semantic vs. deterministic (n=17 each)
 
-**LLM-based verifier, repeated runs at temperature 0:**
+**LLM-based verifier, repeated runs at temperature 0 (non-deterministic):**
 
-| Content | run 1 | run 2 | run 3 |
-|---|---|---|---|
-| real (`alphaN`) | 1/17 flagged | 1/17 | **10/17 flagged** |
-| placeholder | 13/17 caught | 11/17 | 17/17 (with regex prefilter) |
-| junk | 17/17 | 17/17 | 17/17 |
-| empty | 17/17 | 17/17 | 17/17 |
+| Content | run 1 | run 2 | run 3 | variance |
+|---|---|---|---|---|
+| real (`alphaN`) | 1/17 flagged | 1/17 | 10/17 | **5.9%–58.8% FP** |
+| placeholder | 13/17 caught | 11/17 | 17/17 (w/ regex) | 64.7%–100% recall |
+| junk | 17/17 | 17/17 | 17/17 | stable |
+| empty | 17/17 | 17/17 | 17/17 | stable |
 
-The LLM alone is non-deterministic on both axes: it can miss
+The LLM verifier is non-deterministic on both axes: it can miss
 placeholders (64.7%–76.5% across runs) or over-flag correct content
-(5.9%–58.8% false positive across runs). It cannot reach 100% on
-either axis because internal reasoning samples.
+(5.9%–58.8% false positive across runs). Sampling-based inference
+cannot reach 100% on either axis because the sampling is the source
+of variance, not a bug in the prompt.
 
-**Deterministic verifier — no LLM calls, string equality only:**
+**Deterministic verifier — 0 LLM calls, string equality only:**
 
 Content verification is not a semantic problem. The rule is:
-`fs_write.content == fs_read.observation`. Anything else is wrong.
-Three syntactic checks cover all tested classes:
+`fs_write.content` must equal a preceding `fs_read.observation`.
+Anything else is wrong. Three syntactic checks cover all tested classes:
 
 1. Empty content → INCORRECT
 2. Template/placeholder syntax (regex) → INCORRECT
-3. Content does not equal any prior `fs_read` observation → INCORRECT
+3. Content not equal to any prior `fs_read` observation → INCORRECT
 4. Otherwise → CORRECT
 
 | Content | flagged INCORRECT | rate | reason |
@@ -167,29 +168,23 @@ Three syntactic checks cover all tested classes:
 | junk (`XXXX…`) | **17 / 17** | **100%** | ≠ any read |
 | empty (`""`) | **17 / 17** | **100%** | empty check |
 
-**All four classes at 100%. 0 LLM calls. 0 ms latency. 0 variance.**
+**All four classes at ceiling. 0 LLM calls. 0 ms latency. 0 variance.**
 
-**Production fix summary — three layers, all deterministic:**
+### 4.5 Three-layer fix summary
 
 | Layer | Baseline | Fixed | Method |
 |---|---|---|---|
-| Planner | 12/17 emit placeholder | 5–12/17 (variance) | rule 9 — helps Class A only |
-| Executor | 12/17 written wrong | **0/17** | regex substitution pass |
-| Verifier | 11–13/17 detection, 1–10/17 FP | **17/17 detection, 0/17 FP** | deterministic |
+| Planner | 12/17 emit placeholder | 5–12/17 (variance) | prompt rule 9 — Class A only |
+| Executor | 12/17 written wrong | **0/17** | substitution pass |
+| Verifier | 64.7–76.5% detection, 5.9–58.8% FP | **100% detection, 0% FP** | deterministic |
 
-**The finding.** Content verification is a **string equality** problem,
-not a semantic reasoning problem. Treating it as semantic (LLM-based)
-introduces variance on both axes: the same prompt at temperature 0
-gives 64.7% to 100% recall and 5.9% to 58.8% false positive across
-runs. Treating it as syntactic (deterministic regex + equality)
-reaches **100% on both axes with zero LLM cost**.
-
-Prompt engineering helps for value-in-goal cases (Class A) but is
-non-deterministic. Deterministic checking is required for anything
-with a well-defined correctness predicate — which content verification
-is. The three-layer fix (planner rule, executor substitution,
-deterministic verifier) achieves 100% where every layer alone caps out
-below it.
+**The finding.** Content verification is a string-equality problem.
+Semantic verifiers cap at whatever the model's sampling variance allows
+(measured: 65–80% detection, 5.9–58.8% FP). Deterministic verifiers
+reach 100% because there is nothing to sample — either the string
+matches or it does not. Prompt engineering helps Class A (value stated
+in goal) but remains non-deterministic; deterministic substitution and
+deterministic verification are necessary for stable 100%.
 
 ### 4.5 Capability probes (negative result)
 
