@@ -1,0 +1,53 @@
+{
+  "id": "H007",
+  "registered_at": "2026-10-27T00:00:00Z",
+  "status": "prospective",
+  "claim": "Subproblem-B failure is caused by information absence at plan time, not model capability. Supplying the read value (oracle) closes the failure; forbidding placeholder syntax (rule 9) shifts notation without closing it.",
+  "design": {
+    "bench": "bench/families/test/fam14in.jsonl",
+    "n_items": 12,
+    "conditions": {
+      "baseline": "rules 1-8 (rule 9 removed), no oracle value",
+      "oracle": "rules 1-8, seed.txt contents injected",
+      "format": "rules 1-9 (current production prompt), no oracle value",
+      "both": "rules 1-9, seed.txt contents injected"
+    }
+  },
+  "result": {
+    "baseline": {
+      "fail": "11/11",
+      "placeholder": 11,
+      "wrong_literal": 0,
+      "note": "fam14in-01 hit HTTP 524 (cloudflared timeout); resolved ph=True on separate run"
+    },
+    "oracle": {
+      "fail": "0/12",
+      "placeholder": 0,
+      "wrong_literal": 0
+    },
+    "format": {
+      "fail": "12/12",
+      "placeholder": 12,
+      "wrong_literal": 0
+    },
+    "both": {
+      "fail": "0/12",
+      "placeholder": 0,
+      "wrong_literal": 0
+    }
+  },
+  "notation_shift_observed": {
+    "baseline_rules_1_8": "{{read_seed.content}}",
+    "format_rules_1_9": "content of seed.txt (prose deferral)",
+    "paper_production_prompt": "${step1.output}",
+    "reading": "Notation is prompt-sensitive; failure class is invariant. TEMPLATE_RE catches all three."
+  },
+  "verdict": "PASS",
+  "verdict_rule": "PASS if oracle fail << baseline fail AND format fail >= baseline fail",
+  "reading": "Oracle alone drops fail from 100% to 0%. Rule 9 alone does not. The failure is information absence, not capability. This provides causal evidence for the paper's structural claim (sec 4.2-4.3), which previously was only asserted.",
+  "artifacts": {
+    "probe_output": "artifacts/esf/oracle_format_probe.json",
+    "script": "scripts/oracle_format_probe.py"
+  },
+  "cost_llm_calls": 48
+}

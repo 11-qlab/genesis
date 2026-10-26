@@ -145,6 +145,43 @@ Prior drafts reported a larger rule-9 effect (5/17 residual) from an n=17 produc
 
 The prompt rule reduces Subproblem A (already-literal-in-goal) but leaves Subproblem B intact. The executor substitution handles both. Together, the failure is fully closed.
 
+
+
+### 4.3a Causal test: information absence, not capability (n=12, H007)
+
+The ablations above are correlational: they show which intervention reduces the
+failure rate, not *why*. To identify the mechanism we ran a 2x2 oracle-injection
+probe on the 12 items in `bench/families/test/fam14in.jsonl` (48 calls, one
+model, temperature 0):
+
+| Condition | Prompt | Value injected | Fail |
+|---|---|---|---|
+| baseline | rules 1-8 (no rule 9) | no | **11/11 (100%)** |
+| oracle | rules 1-8 | yes (seed.txt contents) | **0/12 (0%)** |
+| format | rules 1-9 (production) | no | **12/12 (100%)** |
+| both | rules 1-9 | yes | **0/12 (0%)** |
+
+**Oracle alone closes the class.** Supplying the value at plan time drops the
+failure rate from 100% to 0%. The model can produce a correct plan when it
+knows the value; it cannot when the value must cross a tool boundary. This is
+the paper's structural claim, causally demonstrated rather than asserted.
+
+**Rule 9 alone does not close the class.** Without a value, forbidding
+placeholder syntax in the prompt (rule 9) shifts the notation from
+`{{read_seed.content}}` to prose (`content of seed.txt`) but leaves the failure
+rate at 100%. Both surface forms are placeholder deferrals; only the first is
+obvious to a naive reader. `TEMPLATE_RE` (`_PATTERNS_V1`) catches both, which
+is why the deterministic verifier's 100% detection in sec 4.4 extends beyond
+brace-form syntax.
+
+**Notation is prompt-sensitive; the failure class is invariant.** Across three
+prompt conditions the same model emits `{{...}}` (rules 1-8), `${...}`
+(production prompt), and prose deferral (rule 9). This corrects a
+notation-specific reading of sec 4.1: the paper's `${step1.output}` is one
+representative of an invariant failure class, not a fixed model behavior.
+
+Full data: `artifacts/esf/oracle_format_probe.json`, `results/H007.json`.
+
 ### 4.4 Verifier behaviour — semantic vs. deterministic (n=17 each)
 
 **LLM-based verifier, repeated runs at temperature 0 (non-deterministic):**

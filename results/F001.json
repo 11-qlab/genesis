@@ -19,5 +19,10 @@
   "prior_errors_corrected": [
     "First F001 claimed 70.6% unsourced in paper \u2014 WRONG, cited at WORKSHOP_PAPER.md:30,96. Only the artifact is missing.",
     "Second F001 claimed 'all traces are flat outcome records' \u2014 WRONG, trace_seed/test have plan_raw."
-  ]
+  ],
+  "h007_corroboration": {
+    "finding": "Rule 9 shifts placeholder notation from brace-form to prose deferral (12/12 format-condition outputs). Both forms are caught by TEMPLATE_RE. The recorder's narrow classifier would label prose as wrong_value; only TEMPLATE_RE catches it.",
+    "implication": "The recorder's classifier undercounts failures whose surface form is prose, not brace. The verifier does not undercount. This is the same pattern as the $sN bug but affects the format condition instead of the baseline condition.",
+    "artifact": "artifacts/esf/oracle_format_probe.json"
+  }
 }

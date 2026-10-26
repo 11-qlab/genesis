@@ -50,3 +50,5 @@ for the length of the study. Coverage gate: `fail_under = 63`
 - Production rate 12/17 (70.6%) is cited in WORKSHOP_PAPER.md §4.1 but has no committed trace artifact; treated as historical.
 - Ground-truth asymmetry: seed bench records `expected`; test bench does not. Test-bench fail labels are harness-self-reported.
 - §7 limitation added to paper describing both.
+
+- H007 PASS (2026-10-27): causal 2x2 on fam14in (n=12, 48 calls). Oracle injection closes Subproblem B (100% -> 0%); rule 9 alone does not (100% -> 100%, notation shifted to prose). Full data: `artifacts/esf/oracle_format_probe.json`.
