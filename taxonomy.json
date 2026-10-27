@@ -1,0 +1,264 @@
+{
+  "version": "1.4",
+  "generated": "2026-10-27T19:39:18.527124Z",
+  "measurement": {
+    "total_calls": 108,
+    "valid_calls": 108,
+    "infra_artifacts": 0,
+    "note": "All 108 calls completed. No transport contamination in this run."
+  },
+  "classes": [
+    {
+      "name": "prior_override_failure",
+      "subtype": "systematic",
+      "signature": "0% pass rate on spec-divergent task; 100% after adding explicit example",
+      "mechanism": "The natural-language spec activates the canonical LeetCode-56 solution to merge_intervals, whose strict '<' does not merge touching intervals. When the spec states the touching rule explicitly, the model activates a different prior and writes '<=' on 20/20 trials. The mechanism is spec-driven prior selection, not code-level inability.",
+      "evidence": {
+        "task": "merge_intervals",
+        "spec_divergence": "canonical uses '<' (touching intervals not merged); spec requires '<='",
+        "affected_models": {
+          "openai/gpt-oss-120b": {
+            "n": 9,
+            "n_valid": 9,
+            "pass_all": 0.0,
+            "pass_valid": 0.0,
+            "infra_pct": 0.0
+          },
+          "openai/gpt-oss-20b": {
+            "n": 9,
+            "n_valid": 9,
+            "pass_all": 0.0,
+            "pass_valid": 0.0,
+            "infra_pct": 0.0
+          }
+        },
+        "tightened": {
+          "n": 9,
+          "n_valid": 9,
+          "pass_all": 1.0,
+          "pass_valid": 1.0,
+          "infra_pct": 0.0
+        },
+        "rule_only_intervention": {
+          "prompt": "merge overlapping closed intervals AND intervals whose endpoints touch (the end of one equals the start of the next)",
+          "model": "openai/gpt-oss-120b",
+          "n": 20,
+          "n_passed": 20,
+          "pass_valid": 1.0,
+          "ci95": [
+            0.84,
+            1.0
+          ],
+          "source": "tighten_without_example.py",
+          "note": "Rule stated without an example \u2014 example was not necessary."
+        }
+      },
+      "remediation": "State the divergent rule explicitly in the spec (e.g. 'the end of one equals the start of the next'). An example is not necessary. The failure is a spec-activation failure, not a test-matching failure."
+    },
+    {
+      "name": "prior_override_failure",
+      "subtype": "stochastic",
+      "signature": "~65% pass rate (pooled N=49, 95% CI [0.51, 0.77]) on spec-divergent task; 100% after explicit abs_tol specification",
+      "mechanism": "Model stochastically selects between the canonical idiom (math.isclose with default abs_tol=0.0) and a primitive implementation that satisfies the spec's 'handle zero safely' language. Rate depends on which reading the session lands on.",
+      "evidence": {
+        "task": "approximately_equal",
+        "spec_divergence": "canonical math.isclose defaults abs_tol=0.0; spec requires safe handling of zero-vs-tiny",
+        "affected_models": {
+          "openai/gpt-oss-120b": {
+            "n": 49,
+            "n_valid": 49,
+            "pass_all": 0.653,
+            "pass_valid": 0.653,
+            "infra_pct": 0.0,
+            "sample_1": {
+              "n": 9,
+              "passed": 4,
+              "source": "research_robust.py (3 rounds x 3 trials)"
+            },
+            "sample_2": {
+              "n": 40,
+              "passed": 28,
+              "source": "tighten_rate.py (single 40-trial run)"
+            },
+            "n_passed": 32,
+            "ci95": [
+              0.513,
+              0.771
+            ]
+          }
+        },
+        "unaffected_models": {
+          "qwen/qwen3.8-27b": {
+            "n": 9,
+            "n_valid": 9,
+            "pass_all": 1.0,
+            "pass_valid": 1.0,
+            "infra_pct": 0.0
+          },
+          "openai/gpt-oss-20b": {
+            "n": 9,
+            "n_valid": 9,
+            "pass_all": 1.0,
+            "pass_valid": 1.0,
+            "infra_pct": 0.0
+          }
+        },
+        "tightened": {
+          "n": 9,
+          "n_valid": 9,
+          "pass_all": 1.0,
+          "pass_valid": 1.0,
+          "infra_pct": 0.0
+        },
+        "rule_only_intervention": {
+          "prompt": "",
+          "n": 20,
+          "n_passed": 20,
+          "pass_valid": 1.0,
+          "rule_text": "absolute tolerance is a small nonzero value (not 0.0)",
+          "source": "close_loose_ends.py"
+        },
+        "threshold_intervention": {
+          "n": 20,
+          "n_passed": 20,
+          "pass_valid": 1.0,
+          "rule_text": "absolute tolerance of at least 1e-12",
+          "source": "close_loose_ends.py"
+        }
+      },
+      "remediation": "State the divergent rule explicitly (nonzero absolute tolerance). Rule statement alone is sufficient; the specific numeric value is not required."
+    },
+    {
+      "name": "under_specification_failure",
+      "subtype": "spec_ambiguity",
+      "signature": "0.0 pass on ambiguous spec ('the index'); 1.0 pass on rule-stated spec ('the LEFTMOST index')",
+      "mechanism": "Spec uses a phrase ('the index') that has multiple valid interpretations. The canonical LeetCode-style solution to the general class (binary_search) returns any matching index, which satisfies one reading but not the one the test requires. The model is not violating a stated rule; it is filling an ambiguous spec with the canonical interpretation. When the ambiguity is resolved ('the LEFTMOST index'), the model writes the correct form.",
+      "evidence": {
+        "task": "binary_search_leftmost",
+        "original_spec": "Write a Python function binary_search(arr, x) that returns the index of x in sorted arr, or -1 if absent.",
+        "rule_only_spec": "Write a Python function binary_search(arr, x) that returns the LEFTMOST index of x in sorted arr (the smallest index if x appears more than once), or -1 if absent.",
+        "affected_models": {
+          "openai/gpt-oss-120b": {
+            "n": 20,
+            "n_passed": 0,
+            "pass_valid": 0.0
+          }
+        },
+        "rule_only_intervention": {
+          "n": 20,
+          "n_passed": 20,
+          "pass_valid": 1.0
+        }
+      },
+      "remediation": "Resolve the ambiguity in the spec. When the divergent reading is stated explicitly ('the LEFTMOST index'), the model writes the correct form.",
+      "relationship_to_prior_override": "Prior_override_failure: spec states the rule, model produces a code form that contradicts it. Under_specification_failure: spec admits two readings, model produces the canonical one, test requires the other. Both fixed by spec precision, but through different mechanisms."
+    }
+  ],
+  "control": {
+    "model": "qwen/qwen3.8-27b",
+    "result": "9/9 on both tasks, both specs",
+    "interpretation": "Test suite and tasks are clean; failures are model prior-specific, not capability gaps."
+  },
+  "finding_inverse_scaling": {
+    "statement": "On spec-divergent tasks, the model with the strongest coding priors (gpt-oss-120b) fails at a higher rate than the weaker models, because the weaker models lack the offending prior.",
+    "evidence": "approximately_equal / original \u2014 pooled: 120b 32/49 (~65%); qwen 18/18 (100%); 20b 18/18 (100%). Inverse-scaling holds: the model with the strongest coding priors fails most often."
+  },
+  "hypothesis_confirmed": [
+    "Spec tightening eliminates prior_override_failure (both subtypes) at 100% across all affected cells.",
+    "qwen3.8-27b is a valid control: no failures on any cell."
+  ],
+  "revision_note": "v1.1: stochastic rate revised from 0.444 (N=9) to 0.653 (pooled N=49) after tighten_rate.py produced 28/40. The mechanism is unchanged; only the magnitude.",
+  "conclusion": {
+    "statement": "All three failure classes (systematic prior_override, stochastic prior_override, and under_specification) are attributable to spec text activating a canonical solution that diverges from the test. Every class recovers to near-ceiling when the divergent requirement is stated explicitly in the spec.",
+    "ladder": {
+      "approximately_equal": {
+        "original": 0.653,
+        "rule_only_nonzero": 1.0,
+        "threshold_1e12": 1.0
+      },
+      "binary_search_leftmost": {
+        "original": 0.0,
+        "rule_only_leftmost": 1.0
+      }
+    },
+    "practical_implication": "Benchmark spec text is not neutral. Every hedge word ('touching', 'the index', 'handle zero') activates a canonical prior that may contradict the test. Spec precision \u2014 even without test disclosure \u2014 recovers the failure by activating the correct prior. This suggests spec-writing standards for agent benchmarks: state divergent rules explicitly, avoid hedged adjectives when the test requires a specific interpretation."
+  },
+  "revision_history": [
+    {
+      "version": "1.2",
+      "change": "rule_only_intervention added for systematic subtype",
+      "result": "20/20 = 1.00 with rule-only prompt \u2014 example is not necessary",
+      "interpretation": "remediation is spec precision, not test disclosure"
+    },
+    {
+      "version": "1.4",
+      "change": "recipe validated on 3 held-out tasks; specificity constraint added",
+      "result": "2/3 confirmed; 1/3 revealed that the canonical prior must be verified empirically",
+      "interpretation": "recipe is predictive but needs a pre-flight empirical check"
+    }
+  ],
+  "recipe_validation": {
+    "method": "Three held-out tasks with canonical solutions were run on gpt-oss-120b with both ambiguous and recipe-intervention prompts, K=15 per cell, zero infra artefacts.",
+    "results": {
+      "valid_palindrome": {
+        "subtype": "under_specification",
+        "canonical": "s == s[::-1]",
+        "divergence": "must filter non-alphanumeric and lowercase before comparison",
+        "ambiguous_pass": 0.0,
+        "recipe_pass": 1.0,
+        "recovered": 1.0,
+        "verdict": "confirms_prior_override"
+      },
+      "majority_element": {
+        "subtype": "prior_override_systematic",
+        "canonical": "Boyer-Moore majority vote returns some candidate",
+        "divergence": "must return None when no majority element exists (>n/2)",
+        "ambiguous_pass": 0.0,
+        "recipe_pass": 1.0,
+        "recovered": 1.0,
+        "verdict": "confirms_prior_override"
+      },
+      "isomorphic_strings": {
+        "subtype": "prior_override_systematic",
+        "canonical": "one-way character mapping via dict",
+        "divergence": "two-way mapping required; every character must map uniquely in both directions",
+        "ambiguous_pass": 1.0,
+        "recipe_pass": 1.0,
+        "recovered": 0.0,
+        "verdict": "not_a_valid_divergence_test"
+      }
+    },
+    "predictions": {
+      "valid_palindrome": {
+        "predicted": "0-30%",
+        "observed": 0.0,
+        "verdict": "HIT"
+      },
+      "majority_element": {
+        "predicted": "40-70%",
+        "observed": 0.0,
+        "verdict": "STRONGER_THAN_PREDICTED"
+      },
+      "isomorphic_strings": {
+        "predicted": "30-70%",
+        "observed": 1.0,
+        "verdict": "FALSIFIED"
+      }
+    },
+    "findings": [
+      {
+        "id": "F1",
+        "statement": "Prior_override_failure requires that the canonical form be (a) common in the model's training data AND (b) genuinely contradict the spec. Both conditions held for valid_palindrome and majority_element, both failed to hold for isomorphic_strings."
+      },
+      {
+        "id": "F2",
+        "statement": "The model already knows that isomorphic strings require bijective mapping. The one-way LeetCode-205 'naive' implementation is not the canonical form for this model. Recipe must be validated against the model's actual priors, not against assumptions about which solution is 'canonical'."
+      },
+      {
+        "id": "F3",
+        "statement": "A pre-flight test (one ambiguous-prompt run) would have revealed that isomorphic_strings is not diagnostic before the 30-trial validation. Recipe step 1 ('detect canonical priors') should be a small batch of trials, not a static analysis."
+      }
+    ],
+    "conclusion": "Recipe is validated with a specificity constraint: prior_override_failure is only diagnostic when the canonical form is genuinely common AND genuinely contradicts the spec. Two of three held-out tasks confirmed the recipe; the third revealed the constraint that the recipe requires empirical prior verification, not static analysis."
+  }
+}

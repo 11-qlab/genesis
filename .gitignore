@@ -1,29 +1,75 @@
-.venv/
+# Python
 __pycache__/
-*.py[cod]
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
-*.egg-info/
-build/
-dist/
+*.pyc
+.venv/
+.venv-*/
+
+# Secrets and env
 .env
-state/*.sqlite3*
-state/workspace/*
-state/logs/*
-logs/
-checkpoints/*
-artifacts/*
-experiments/*
-!state/workspace/.gitkeep
-!artifacts/.gitkeep
-!experiments/.gitkeep
-!checkpoints/.gitkeep
-.agi_env
-!artifacts/*.json
-artifacts/agi_signal_*.json
-artifacts/mi_missing_20b.json
-genesis/
+.env.*
+*.key
+*.pem
+secrets/
+
+# API keys echoed in logs
+*.log
+run*.log
+research_*.log
+cf_run_*.log
+audit*.log
+reclassify*.log
+counterfactual*.log
+ambiguity_*.log
+tighten_*.log
+close_loose*.log
+validate_recipe*.log
+identity_control*.log
+
+# Raw API outputs (may contain echoes of the prompt including partial keys)
+signals/
+signals_robust/
+signals_adv/
+
+# tmux/nohup
+nohup.out
+
+# Editor
+*.swp
+.DS_Store
+
+# Added after audit — these were wrongly committed
 .coverage
-.import_linter_cache/
-*.bak
+.coverage.*
+htmlcov/
+state/
+artifacts/
+runs/
+runs_adv/
+runs_hard/
+signals_hard/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Research artifacts from this session
+failures_report.txt
+runs/
+runs_adv/
+runs_hard/
+signals_hard/
+signals_robust/*.jsonl
+.venv*/
+.venv-nodocker/
+
+# Local state that upstream tracks — do not modify
+state/
+artifacts/
+
+# Build junk
+__pycache__/
+*.pyc
+.coverage
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.log
