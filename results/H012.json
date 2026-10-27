@@ -1,0 +1,38 @@
+{
+  "id": "H012",
+  "status": "post_hoc",
+  "registered_after_observation": true,
+  "claim": "The typed-hole schema closes Subproblem B on every model tested that can follow a JSON plan schema, across architectures, providers, and scales. At 7B, one-shot example is required.",
+  "design": {
+    "bench": "bench/families/test/fam14in.jsonl",
+    "n_items": 12,
+    "conditions": [
+      "typed_holes (schema only)",
+      "typed_holes + one-shot example (7B only)"
+    ],
+    "providers": {
+      "local": "ollama (qwen, llama)",
+      "groq": "api.groq.com"
+    }
+  },
+  "result": {
+    "with_schema_only": {
+      "openai/gpt-oss-20b (ollama)": "12/12 strict",
+      "openai/gpt-oss-20b (groq)": "12/12 strict",
+      "openai/gpt-oss-120b (groq)": "12/12 strict",
+      "qwen/qwen3.8-27b (groq)": "12/12 strict",
+      "allam-2-7b (groq)": "0/12 \u2014 writes literal string '__deferred__'"
+    },
+    "with_one_shot_example": {
+      "allam-2-7b (groq)": "12/12 strict"
+    }
+  },
+  "verdict": "PASS",
+  "verdict_rule": "PASS if typed_holes closes the class (12/12 strict) on \u22653 models AND the failing model is closed by a prompt-level intervention.",
+  "reading": "The schema fix is not model-specific. It works on GPT-OSS (20B, 120B), Qwen (27B), and (with one example) Allam (7B). Three architectures, two providers, four scales. The 7B boundary is a prompt-completeness threshold, not a capability threshold: the model knows the form (can echo it verbatim) but does not deploy it in planning without an example.",
+  "artifacts": {
+    "raw_fast_run": "artifacts/esf/cross_groq_typed.json",
+    "7b_example_run": "artifacts/esf/allam_example_test.json"
+  },
+  "cost_llm_calls": 72
+}

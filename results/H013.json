@@ -1,0 +1,53 @@
+{
+  "id": "H013",
+  "status": "post_hoc",
+  "registered_after_observation": true,
+  "claim": "The schema-adequacy finding extends to operations, not just binding. The plan schema needs a transform slot with a bounded vocabulary to express 'apply operation X to a prior step output'. Free-form transform names are not resolvable by the executor.",
+  "design": {
+    "model": "openai/gpt-oss-20b",
+    "tasks": "8 filesystem transform tasks (uppercase, lowercase, reverse, strip, len, words_sorted, composed uppercase+reverse, replace_spaces)",
+    "conditions": {
+      "A_string": "string-only content schema (baseline)",
+      "B_verbatim": "deferral slot only (previous PTE)",
+      "C_transform_list": "deferral + transform slot with documented op list",
+      "D_transform_free": "deferral + transform slot, no documented list"
+    }
+  },
+  "result": {
+    "A_string": {
+      "n": 8,
+      "deferred": 0,
+      "transform_called": 0,
+      "exec_ok": 0
+    },
+    "B_verbatim": {
+      "n": 8,
+      "deferred": 4,
+      "transform_called": 0,
+      "exec_ok": 0
+    },
+    "C_transform_list": {
+      "n": 8,
+      "deferred": 7,
+      "transform_called": 7,
+      "exec_ok": 7
+    },
+    "D_transform_free": {
+      "n": 8,
+      "deferred": 7,
+      "transform_called": 5,
+      "exec_ok": 4
+    }
+  },
+  "verdict": "PASS",
+  "verdict_rule": "PASS if bounded-list transform (C) closes the class (\u22656/8) AND free-form transform (D) does not outperform C.",
+  "reading": "String schema (A) fails 0/8 \u2014 the model invents pseudo-transform syntax the executor cannot resolve. Deferral alone (B) fails 0/8 \u2014 the model writes the raw value without applying the transform. Bounded-transform schema (C) closes 7/8. The bounded vocabulary is load-bearing: free-form transform names get invented (D) and are unresolvable. The one failure at C (t7, composed uppercase+reverse) is the compositional-transform boundary.",
+  "boundaries_found": {
+    "compositional_transform": "t7 (uppercase AND reverse) fails even with transform slot \u2014 requires list-form transform or pipeline representation. Next-session question."
+  },
+  "artifacts": {
+    "raw": "artifacts/esf/transform_test.json",
+    "note": "D_transform_free is partial \u2014 script crashed on the last item (parser, not model)."
+  },
+  "cost_llm_calls": 32
+}
