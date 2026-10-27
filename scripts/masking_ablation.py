@@ -43,7 +43,7 @@ def main():
     import sys
     sys.path.insert(0, "scripts")
     try:
-        from verifier_deterministic import extract_reads as verify  # FILL: actual import
+        from verifier_deterministic import verify  # FILL: actual import
     except Exception as e:
         sys.exit(f"PROBE FAIL: cannot import verifier ({e}). "
                  "Point this at the callable used by scripts/verifier_deterministic.py")

@@ -1,6 +1,6 @@
 # STATUS
 
-Last verified snapshot: fbe0c41 (2026-10-27)
+Last verified snapshot: 4bbc216 (2026-10-27)
 
 ## What this repo is
 

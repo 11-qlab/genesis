@@ -1,0 +1,23 @@
+{
+  "id": "H006",
+  "per_cond": {
+    "baseline": {
+      "n": 10,
+      "placeholder": 10,
+      "no_write": 0,
+      "fail": 10,
+      "fail_rate": 1.0
+    },
+    "patched": {
+      "n": 10,
+      "placeholder": 6,
+      "no_write": 4,
+      "fail": 10,
+      "fail_rate": 1.0
+    }
+  },
+  "pooled_rate": 0.8,
+  "spread": 0.0,
+  "verdict": "REJECTED",
+  "verdict_rule": "PASS if per-cond fail rate spread > 0.05"
+}
