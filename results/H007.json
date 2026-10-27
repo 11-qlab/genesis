@@ -49,5 +49,7 @@
     "probe_output": "artifacts/esf/oracle_format_probe.json",
     "script": "scripts/oracle_format_probe.py"
   },
-  "cost_llm_calls": 48
+  "cost_llm_calls": 48,
+  "registered_after_observation": true,
+  "post_hoc_note": "H007 attribution added after execution. Same epistemic status as H001-H004. A prospective version would register the hypothesis before running."
 }

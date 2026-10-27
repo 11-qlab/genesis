@@ -57,7 +57,7 @@ def run_one(task: dict, model, base, key) -> dict:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--bench", default="bench/test")
+    ap.add_argument("--bench", default="bench/families/test/fam14in.jsonl")
     ap.add_argument("--out", default="/tmp/rewoo_baseline.jsonl")
     ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
@@ -65,9 +65,17 @@ def main():
     key  = os.environ.get("AGI_API_KEY", "EMPTY")
     if not base or not model: sys.exit("set AGI_BASE_URL and AGI_MODEL")
     # FILL: how bench tasks are stored
+    bench = pathlib.Path(a.bench)
     tasks = []
-    for p in sorted(pathlib.Path(a.bench).rglob("*.json")):
-        tasks.append(json.loads(p.read_text()))
+    if bench.is_file() and bench.suffix == ".jsonl":
+        tasks = [json.loads(l) for l in bench.read_text().splitlines() if l.strip()]
+    else:
+        for p in sorted(bench.rglob("*.json*")):
+            txt = p.read_text()
+            if p.suffix == ".jsonl":
+                tasks += [json.loads(l) for l in txt.splitlines() if l.strip()]
+            else:
+                d = json.loads(txt); tasks += d if isinstance(d, list) else [d]
     if a.limit: tasks = tasks[:a.limit]
     print(f"[rewoo] {len(tasks)} tasks from {a.bench}")
     pathlib.Path(a.out).parent.mkdir(parents=True, exist_ok=True)
