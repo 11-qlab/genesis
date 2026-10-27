@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Bench-split analysis: seed (value in goal) vs test (value from tool)."""
-import json, re, sys
+import json, os, sys, pathlib, re, sys
 from collections import defaultdict, Counter
 from math import comb
 from pathlib import Path
@@ -16,9 +16,9 @@ def load(path):
     return [json.loads(l) for l in Path(path).read_text().strip().splitlines()]
 
 datasets = {
-    "seed (value in goal)":   load("artifacts/traces/trace_seed.jsonl"),
-    "test (value from tool)": load("artifacts/traces/trace_test.jsonl"),
-    "combined":                load("artifacts/traces/planner_traces.jsonl"),
+    "seed (value in goal)":   load(str(pathlib.Path(os.environ.get("ARTIFACTS_DIR", "artifacts/traces")) / "trace_seed.jsonl")),
+    "test (value from tool)": load(str(pathlib.Path(os.environ.get("ARTIFACTS_DIR", "artifacts/traces")) / "trace_test.jsonl")),
+    "combined":                load(str(pathlib.Path(os.environ.get("ARTIFACTS_DIR", "artifacts/traces")) / "planner_traces.jsonl")),
 }
 
 print(f"{'dataset':<24}{'cond':<10}{'n':<4}{'placeholder':<13}{'literal':<9}{'other':<7}")

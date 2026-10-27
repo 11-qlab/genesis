@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import json, re, sys
+import json, os, sys, pathlib, re, sys
 from collections import Counter, defaultdict
 from math import comb
 from pathlib import Path
 
-rows = [json.loads(l) for l in Path("artifacts/traces/planner_traces.jsonl").read_text().strip().splitlines()]
+rows = [json.loads(l) for l in Path(str(pathlib.Path(os.environ.get("ARTIFACTS_DIR", "artifacts/traces")) / "planner_traces.jsonl")).read_text().strip().splitlines()]
 
 MARKERS = {
     "template_language": r"template|placeholder|reference|\{\{|\$\{",
