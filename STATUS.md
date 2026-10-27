@@ -1,5 +1,7 @@
 # STATUS
 
+> Active finding: see `docs/research/PTE_FINDING.md`
+
 Last verified snapshot: 90be7e0 (2026-10-27)
 
 ## What this repo is
