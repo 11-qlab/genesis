@@ -30,6 +30,14 @@ A cross-step task succeeds when the plan schema and executor together provide:
 
 Remove any one and success collapses to 0. Each was tested.
 
+**A new observation from the comparison layer:** without a slot for the
+relation, the model produces no write step at all (0/3 `no_write`), rather
+than inventing pseudo-syntax as it did for binding and transform. This
+suggests the model respects a well-formed schema: when the affordance is
+missing, it refuses to plan rather than emitting a malformed plan. Silent
+refusal is a better failure mode than silent wrong output — it is detected
+immediately instead of at execution.
+
 ## The affordance table — with-success vs without
 
 | Task class | Success affordance | With | Without |
@@ -39,6 +47,7 @@ Remove any one and success collapses to 0. Each was tested.
 | Single-op transform | `transform: <op>` + bounded list | **7/8** | 0/8 |
 | Composed transform | `transform: [op1, op2]` | **3/3** | 0/1 |
 | Multi-input | `__concat__: [{...}, {...}]` | **2/2** | — |
+| Comparison (unseen) | `__compare__: [{...}, {...}, "longer"]` | **3/3** | 0/3 |
 | 7B model with schema only | typed slot | 0/12 | — |
 | 7B model with one example | typed slot + demo | **12/12 strict** | — |
 | ReWOO `#E1` comparison | `#E1` placeholder | **3/3** | — |
@@ -111,7 +120,8 @@ To make a tool-using planner succeed on cross-step tasks:
   is a different task family. Authoring one would test generalization to
   rephrasing specifically.
 - **Regex-count slot** — the natural next typed slot. `{__regex_count__:
-  {from, pattern}}` — untested.
+  {from, pattern}}` — untested. fam14out's failure is now interpretable:
+  it requires this slot, not a fault in the affordance.
 - **Larger n per condition** — fam14in has n=12. A fresh n=30 would tighten
   the cross-model claims.
 
