@@ -1,0 +1,45 @@
+{
+  "id": "H009",
+  "status": "post_hoc",
+  "claim": "Subproblem B is a schema-adequacy failure, not a model-capability or prompt-formatting failure. When the plan schema has a typed deferral slot, the model uses it 12/12 times and produces 0 failures. When the schema has only a string slot, the model invents pseudo-deferral syntax (`{'$ref': 's1'}`, `{'deferred': 'r1'}`, `$.steps[0].output`) that the executor cannot parse, and fails 12/12.",
+  "design": {
+    "bench": "bench/families/test/fam14in.jsonl",
+    "n_items": 12,
+    "model": "gpt-oss-20b",
+    "temperature": 0,
+    "conditions": {
+      "string_baseline": "string-only schema (content: str), no value injected",
+      "string_oracle":   "string-only schema, seed.txt contents injected",
+      "typed_holes":     "schema: content: str | {__deferred__: {from, field}}, no value injected",
+      "typed_holes_oracle": "schema with typed holes, seed.txt contents injected"
+    }
+  },
+  "result": {
+    "string_baseline": {"fail": "12/12", "deferred": 0, "placeholder_str": 12},
+    "string_oracle":   {"fail": "12/12", "deferred": 0, "placeholder_str": 7, "wrong_literal": 2, "no_write": 3,
+                        "invented_deferral_forms": ["{'$defer': 'r1'}", "{'$ref': 's1'}",
+                                                     "{'deferred': 'r1'}", "'deferred'",
+                                                     "'$.steps[0].output'"]},
+    "typed_holes":     {"fail": "0/12", "deferred": 12},
+    "typed_holes_oracle": {"fail": "0/12", "deferred": 12}
+  },
+  "verdict": "PASS",
+  "reading": "The typed-hole schema closes the class at 0/12. The string-only schema fails 12/12 even with the value injected, because the model has no legal way to express deferral — so it invents pseudo-syntax the executor cannot resolve. The failure is not in the model. It is in the plan format.",
+  "proposed_algorithm": {
+    "name": "Provenance-Typed Executor (PTE)",
+    "schema_extension": "content: str | DeferredValue, where DeferredValue = {__deferred__: {from: step_id, field: field_name}}",
+    "static_validation": "DeferredValue.from must reference a prior step whose tool produces that field",
+    "runtime_resolution": "DeferredValue resolves to the actual runtime observation of the referenced step; unresolved = hard error, not silent bad write",
+    "what_disappears": ["rule 9 prompt prohibition", "template-regex detection", "string-equality verifier", "prose-deferral detection"],
+    "what_remains": ["static provenance check (zero LLM calls, deterministic)"]
+  },
+  "relationship_to_H007": {
+    "H007_oracle": "manual runtime resolution (inject resolved value) -> 0/12 fail",
+    "H009_typed_holes": "schema-level resolution (executor resolves at execution) -> 0/12 fail",
+    "H007_format": "prohibition without channel -> 12/12 fail (prose)",
+    "H009_string_baseline": "no prohibition, no channel -> 12/12 fail (placeholder)",
+    "unifying_principle": "Any deferral channel the executor can resolve closes the class. Neither prohibition nor value injection is necessary; only a resolvable channel is sufficient."
+  },
+  "paper_impact": "Reframes sec 4.2-4.3: the failure is interface design, not model limitation. Rule 9 is not 'ineffective' — it is doomed by design. The contribution becomes a schema principle, not a prompt-rule critique.",
+  "cost_llm_calls": 48
+}

@@ -1,0 +1,46 @@
+{
+  "id": "H010",
+  "status": "post_hoc",
+  "registered_after_observation": true,
+  "claim": "The Subproblem-B failure is a schema-adequacy failure. When the plan schema includes a typed deferral slot, the model produces valid deferrals 12/12, executes to correct output 12/12, with zero unresolved references under strict validation (no fuzzy fallback used).",
+  "design": {
+    "bench": "bench/families/test/fam14in.jsonl",
+    "n_items": 12,
+    "model": "gpt-oss-20b",
+    "temperature": 0,
+    "conditions": ["typed_holes (no oracle value)", "typed_holes_oracle (value injected)"],
+    "validation": "strict — every __deferred__.from must exactly match a prior step id"
+  },
+  "result": {
+    "typed_holes": {
+      "plans_classified_deferred": "12/12",
+      "plans_executed_correctly": "12/12",
+      "unresolved_deferrals": 0,
+      "fuzzy_fallback_used": 0
+    },
+    "typed_holes_oracle": {
+      "plans_classified_deferred": "12/12",
+      "plans_executed_correctly": "12/12",
+      "unresolved_deferrals": 0
+    }
+  },
+  "verdict": "PASS",
+  "reading": "The typed-hole schema closes Subproblem B end-to-end at 12/12, with strict step-id validation and zero fuzzy fallback. Together with H009 (schema is the operative variable) and H007 (oracle injection also closes, via a different mechanism), the unifying claim is: any deferral channel the executor can resolve closes the class. The class was never a model limitation — it was the absence of a representational slot in the plan format.",
+  "proposed_algorithm": {
+    "name": "Provenance-Typed Executor (PTE)",
+    "schema_extension": "content: str | {__deferred__: {from: step_id, field: str}}",
+    "static_validation": "from must reference a prior step whose tool produces that field; failures reject at plan time",
+    "runtime_resolution": "deferred value resolves to the referenced step's observation; unresolved = hard error",
+    "eliminates": ["rule-9 prompt prohibition", "template regexes", "prose-deferral detection", "content-equality verifier for cross-tool writes"]
+  },
+  "scope_limits": [
+    "one model (gpt-oss-20b)",
+    "one bench (fam14in, n=12)",
+    "one task shape (read file, write contents)"
+  ],
+  "next_experiments": [
+    "fam14out (rephrased family) — does schema fix transfer?",
+    "qwen2.5:14b or llama3.1:8b — does schema fix transfer across models?"
+  ],
+  "cost_llm_calls": 96
+}

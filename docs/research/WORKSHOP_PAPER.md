@@ -194,6 +194,28 @@ stochastic and drives the p-value. Any single-run p-value is one sample
 of a stochastic process with at least three orders of magnitude variance.
 The stable, reproducible claims are the fail rates themselves.
 
+### 4.3c Deployability under the production prompt (H011)
+
+The typed-hole schema works without any prompt rewrite. In a four-condition
+test (n=12, same model, temperature 0), the production rule 9 ("do NOT use
+{{...}}, $X, or reference syntax") does not interfere with the typed deferral
+form:
+
+| Condition | Rule 9? | Fail | Deferred |
+|---|---|---|---|
+| string schema, no rule 9 | no | 11/12 | 0 |
+| typed schema, no rule 9 | no | **0/12** | 12 |
+| typed schema, production rule 9 | **yes** | **0/12** | 12 |
+| typed schema, rewritten rule 9 | yes | 0/12 | 12 |
+
+The model treats `{"__deferred__": {"from": ..., "field": ...}}` as a schema
+value, not as the string marker rule 9 forbids. Rule 9 becomes vestigial
+once the schema has a deferral slot: it can be removed, but it does not
+need to be. **Provenance-Typed Executor is drop-in deployable to the
+existing pipeline.**
+
+Artifacts: `artifacts/esf/typed_holes_rule9.json`, `results/H011.json`.
+
 ### 4.4 Verifier behaviour — semantic vs. deterministic (n=17 each)
 
 **LLM-based verifier, repeated runs at temperature 0 (non-deterministic):**

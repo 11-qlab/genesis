@@ -1,0 +1,33 @@
+{
+  "id": "H011",
+  "status": "post_hoc",
+  "claim": "Rule 9 (the production prompt's 'do NOT use reference syntax') does not interfere with the typed-hole schema. PTE is drop-in deployable.",
+  "design": {
+    "bench": "bench/families/test/fam14in.jsonl",
+    "n_items": 12,
+    "model": "gpt-oss-20b",
+    "temperature": 0,
+    "conditions": [
+      "string_baseline — string schema, no rule 9",
+      "typed_no_rule9 — typed schema, no rule 9",
+      "typed_with_old_rule9 — typed schema + production rule 9",
+      "typed_with_new_rule9 — typed schema + rewritten rule 9 (control)"
+    ]
+  },
+  "result": {
+    "string_baseline": {"fail": "11/12", "placeholder": 11, "literal": 1},
+    "typed_no_rule9": {"fail": "0/12", "deferred": 12},
+    "typed_with_old_rule9": {"fail": "0/12", "deferred": 12},
+    "typed_with_new_rule9": {"fail": "0/12", "deferred": 12}
+  },
+  "verdict": "PASS",
+  "reading": "Rule 9 does not fight the typed-hole schema — the model treats __deferred__ as a schema value, not as the 'reference syntax' rule 9 forbids. PTE deploys to the current pipeline without a prompt rewrite. Rule 9 becomes vestigial once the schema has a deferral slot; it can be removed but does not need to be.",
+  "one_incidental": "string_baseline fam14in-02 produced a literal (not placeholder) — a fourth failure mode: hallucinated-literal-write. Not material to the finding but worth noting in §7.",
+  "relationship": {
+    "H007": "oracle injection also closes, but the effect depends on prompt completeness (0/12 with rules 1-8, 12/12 with rules 1-4)",
+    "H009": "typed-hole schema is the operative variable",
+    "H010": "typed-hole plans execute correctly 12/12 strict",
+    "H011": "PTE is drop-in — rule 9 does not interfere"
+  },
+  "cost_llm_calls": 48
+}

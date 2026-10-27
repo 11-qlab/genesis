@@ -24,5 +24,12 @@
     "finding": "Rule 9 shifts placeholder notation from brace-form to prose deferral (12/12 format-condition outputs). Both forms are caught by TEMPLATE_RE. The recorder's narrow classifier would label prose as wrong_value; only TEMPLATE_RE catches it.",
     "implication": "The recorder's classifier undercounts failures whose surface form is prose, not brace. The verifier does not undercount. This is the same pattern as the $sN bug but affects the format condition instead of the baseline condition.",
     "artifact": "artifacts/esf/oracle_format_probe.json"
+  },
+  "failure_modes_observed": {
+    "hallucinated_literal": {
+      "case": "string_baseline fam14in-02 (H011)",
+      "content": "a literal not equal to the seed value",
+      "note": "Fourth failure mode; the recorder's narrow classifier would label as literal (not failure). Detected only by string-equality against a persisted expected value."
+    }
   }
 }

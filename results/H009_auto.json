@@ -1,0 +1,96 @@
+{
+  "baseline_rate": 0.7666666666666667,
+  "n": 30,
+  "candidates": [
+    {
+      "feature": "goal_word_count",
+      "split": {
+        "long": {
+          "n": 10,
+          "fail": 3,
+          "rate": 0.3
+        },
+        "short": {
+          "n": 20,
+          "fail": 20,
+          "rate": 1.0
+        }
+      },
+      "lift": 0.7,
+      "min_support": 10
+    },
+    {
+      "feature": "plan_step_count_bucket",
+      "split": {
+        "3": {
+          "n": 10,
+          "fail": 3,
+          "rate": 0.3
+        },
+        "2": {
+          "n": 16,
+          "fail": 16,
+          "rate": 1.0
+        },
+        "0-1": {
+          "n": 4,
+          "fail": 4,
+          "rate": 1.0
+        }
+      },
+      "lift": 0.7,
+      "min_support": 4
+    },
+    {
+      "feature": "reasoning_mentions_step",
+      "split": {
+        "true": {
+          "n": 11,
+          "fail": 4,
+          "rate": 0.36363636363636365
+        },
+        "false": {
+          "n": 19,
+          "fail": 19,
+          "rate": 1.0
+        }
+      },
+      "lift": 0.6363636363636364,
+      "min_support": 11
+    },
+    {
+      "feature": "reasoning_mentions_plan",
+      "split": {
+        "true": {
+          "n": 9,
+          "fail": 3,
+          "rate": 0.3333333333333333
+        },
+        "false": {
+          "n": 21,
+          "fail": 20,
+          "rate": 0.9523809523809523
+        }
+      },
+      "lift": 0.6190476190476191,
+      "min_support": 9
+    },
+    {
+      "feature": "reasoning_len",
+      "split": {
+        "medium": {
+          "n": 6,
+          "fail": 2,
+          "rate": 0.3333333333333333
+        },
+        "short": {
+          "n": 24,
+          "fail": 21,
+          "rate": 0.875
+        }
+      },
+      "lift": 0.5416666666666667,
+      "min_support": 6
+    }
+  ]
+}
