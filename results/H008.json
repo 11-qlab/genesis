@@ -1,0 +1,33 @@
+{
+  "id": "H008",
+  "status": "post_hoc",
+  "registered_after_observation": true,
+  "claim": "Per-condition fail rate reproduces across runs; patched-mode split and Fisher p-value do not.",
+  "runs": {
+    "run1_committed_2026_10_26": {
+      "test_baseline": {"fail": "10/10", "placeholder": 10, "no_write": 0},
+      "test_patched":  {"fail": "10/10", "placeholder": 6,  "no_write": 4},
+      "fisher_p": 0.0867
+    },
+    "run2_clobbered_2026_10_27": {
+      "test_baseline": {"fail": "10/10", "placeholder": 10, "no_write": 0},
+      "test_patched":  {"fail": "10/10", "placeholder": 1,  "no_write": 9},
+      "fisher_p": 0.0001
+    },
+    "run3_isolated_2026_10_27": {
+      "test_baseline": {"fail": "10/10", "placeholder": 10, "no_write": 0},
+      "test_patched":  {"fail": "10/10", "placeholder": 6,  "no_write": 4},
+      "fisher_p": 0.0867
+    }
+  },
+  "fisher_variance": {
+    "observed_p_values": {"run1": 0.0867, "run2": 0.0001, "run3": 0.0867},
+    "range": "0.0001 - 0.0867",
+    "reading": "Three orders of magnitude across reruns at temp 0. Fail rate is stable; mode split and p-value are not."
+  },
+  "verdict": "PASS",
+  "verdict_rule": "PASS if fail rate identical across runs AND mode split varies.",
+  "reading": "Fail rates reproduce exactly (test baseline 10/10, test patched 10/10). Mode split varies (6:4, 1:9, 6:4). Rule 9 introduces a stochastic second failure mode.",
+  "paper_action": "sec 4.1 mode split labeled as single-sample; sec 4.3b added on p-value variance.",
+  "cost_llm_calls": 30
+}

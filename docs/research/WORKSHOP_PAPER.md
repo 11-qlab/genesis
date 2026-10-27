@@ -182,6 +182,18 @@ representative of an invariant failure class, not a fixed model behavior.
 
 Full data: `artifacts/esf/oracle_format_probe.json`, `results/H007.json`.
 
+### 4.3b Reproducibility of the Fisher test
+
+The Fisher exact test on the test-bench baseline-vs-patched placeholder
+comparison is not stable across reruns. Three runs of the same model
+(gpt-oss-20b) at temperature 0 produced placeholder counts in the patched
+condition of 6/10, 1/10, and 6/10, yielding p = 0.0867, 0.0001, and
+0.0867. The fail rate per condition is stable (test baseline 10/10, test
+patched 10/10); the mode split between placeholder and no-write is
+stochastic and drives the p-value. Any single-run p-value is one sample
+of a stochastic process with at least three orders of magnitude variance.
+The stable, reproducible claims are the fail rates themselves.
+
 ### 4.4 Verifier behaviour — semantic vs. deterministic (n=17 each)
 
 **LLM-based verifier, repeated runs at temperature 0 (non-deterministic):**
