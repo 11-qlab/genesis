@@ -46,3 +46,20 @@ Genesis: **3/3 classes** have an in-loop execution-verifiable oracle (known-corr
 5. Each grounded class rests on **exactly one** discriminating anchor
    (3/9 total). Single-anchor support is thin. Reporting the count is the honest
    alternative to a false confidence interval.
+
+## Differential name-contrast oracle (new)
+
+**Oracle type:** `model(name_a, spec) == model(name_b, spec)` after normalizing the name. 
+Needs no `_known_correct_for`. That is the methodology claim.
+
+**Result (36 calls, 2 families):**
+
+| model | grounded | name-invariant |
+|---|---|---|
+| `groq_gpt_oss_20b` | 3/3 | 0/3 |
+| `groq_qwen_38_27b` | 1/3 | 2/3 |
+
+**Finding (refined):** name-trigger is family-*and*-contrast dependent. `gpt-oss-20b` is name-sensitive on all 3 contrasts, including within-family variants (`binary_search` vs `find_index`). `qwen3.8-27b` is name-sensitive only on `binary_search` vs `min_heap` — the one contrast where names cue *different structural algorithms* — and name-invariant on within-family variants (`binary_search` vs `find_index`; `find_index` vs `smallest_k`). The mechanism is not universal name-token sensitivity; it is *structural-prior sensitivity*, and different families sit at different points on that axis.
+
+**What this changes vs the original taxonomy:** the `function_name_trigger` class is confirmed at N=15 for `gpt-oss-120b` (pass_rate 0.0). This differential test shows the effect generalizes across name contrasts for the gpt-oss family but **not** for qwen — meaning the class's mechanism as originally stated (name-token activates canonical prior) is a **sufficient** description for gpt-oss but only a **partial** one for qwen.
+

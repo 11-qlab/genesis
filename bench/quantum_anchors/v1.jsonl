@@ -1,0 +1,2 @@
+{"analytic_expected": 3.0, "counts": {"000": 49944, "111": 50056}, "expected": 3.0, "id": "Q001", "name": "ghz_3_even_parity", "pairs": [[0, 1], [1, 2], [0, 2]], "shots": 100000}
+{"analytic_expected": 1.0, "counts": {"00": 49929, "11": 50071}, "expected": 1.0, "id": "Q002", "name": "bell_zz", "pairs": [[0, 1]], "shots": 100000}

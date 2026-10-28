@@ -1,0 +1,3 @@
+{"class": "prior_override_failure/systematic", "reason": "need N>=20, rate limit permits N=15 -> raise limit or reduce class", "verdict": "certified_exhausted"}
+{"class": "prior_override_failure/stochastic", "reason": "need N>=20, rate limit permits N=15 -> raise limit or reduce class", "verdict": "certified_exhausted"}
+{"class": "prior_override_failure/function_name_trigger", "reason": "all observables wired; achievable N sufficient", "verdict": "resolvable"}

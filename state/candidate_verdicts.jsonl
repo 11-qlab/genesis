@@ -1,0 +1,1 @@
+{"base_ok": false, "class": "prior_override_failure/test_gap_for_generation", "id": "C001", "impl_ok": null, "impl_present": false, "impl_stderr": "EMPTY_IMPL", "template": "generated_test_gap_for_generation_1793167022", "timestamp": "2026-10-28T05:57:02.663810+00:00", "verdict": "capability_limit"}

@@ -17,6 +17,8 @@ step "1/4  extract anchors from TEMPLATES + _known_correct_for"
 ./10_extract_anchors.py
 
 step "2/4  verify anchors (the ground-truth oracle)"
+./14_heldout_split.py
+./14_heldout_split.py
 ./20_verify_anchors.py
 ./13_classify_too_strict.py
 
@@ -27,6 +29,8 @@ step "4/4  paper numbers"
 ./40_paper_numbers.py || true
 ./41_fix_grounding_label.py | tee -a paper/numbers.md
 ./42_claims.py
+./44_claim_both_splits.py
+./44_claim_both_splits.py
 
 echo
 echo "${GRN}[ DONE ]${RST}"

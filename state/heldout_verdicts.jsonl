@@ -1,0 +1,9 @@
+{"base_ok": false, "class": "prior_override_failure/systematic", "discriminates": true, "id": "A001H", "impl_ok": true, "renamed": ["f"]}
+{"base_ok": false, "class": "prior_override_failure/systematic", "discriminates": false, "id": "A002H", "impl_ok": false, "renamed": ["f"]}
+{"base_ok": false, "class": "prior_override_failure/systematic", "discriminates": false, "id": "A003H", "impl_ok": false, "renamed": ["f"]}
+{"base_ok": false, "class": "prior_override_failure/stochastic", "discriminates": false, "id": "A004H", "impl_ok": false, "renamed": ["f"]}
+{"base_ok": false, "class": "prior_override_failure/stochastic", "discriminates": true, "id": "A005H", "impl_ok": true, "renamed": ["f"]}
+{"base_ok": false, "class": "prior_override_failure/function_name_trigger", "discriminates": true, "id": "A006H", "impl_ok": true, "renamed": ["binary_search"]}
+{"base_ok": false, "class": "prior_override_failure/function_name_trigger", "discriminates": false, "id": "A007H", "impl_ok": false, "renamed": ["binary_search", "find_index"]}
+{"base_ok": false, "class": "prior_override_failure/function_name_trigger", "discriminates": false, "id": "A008H", "impl_ok": false, "renamed": ["binary_search", "min_heap"]}
+{"base_ok": false, "class": "prior_override_failure/function_name_trigger", "discriminates": false, "id": "A009H", "impl_ok": false, "renamed": ["binary_search", "smallest_k"]}

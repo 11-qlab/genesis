@@ -1,0 +1,2 @@
+{"id":"Q001","name":"ghz_3_even_parity","backend":"ibm_fez","expected":3.0,"measured":2.92,"sigma":0.0469,"deviation_sigma":1.71,"grounded":true,"shots":4096}
+{"id":"Q002","name":"bell_zz","backend":"ibm_fez","expected":1.0,"measured":0.957,"sigma":0.0156,"deviation_sigma":2.75,"grounded":true,"shots":4096}
