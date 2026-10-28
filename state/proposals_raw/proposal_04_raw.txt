@@ -1,0 +1,1 @@
+{"name":"wrong_operator_precedence","subtype":"arithmetic","mechanism":"Model applies incorrect operator precedence leading to wrong calculation","spec":"Write f(a,b,c) returning a + b * c","impl_src":"def f(a,b,c):\n    return a + b * c","base_src":"def f(*a, **k): return None","test_src":"assert f(2,3,4) == 14\nprint('PASS')"}

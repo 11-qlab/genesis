@@ -1,0 +1,1 @@
+{"name":"output_type_mismatch","subtype":"wrong_return_type","mechanism":"Model returns a string instead of a list","spec":"f(n) returns list of integers from 1 to n","impl_src":"def f(n):\n    return list(range(1, n+1))","base_src":"def f(*a, **k): return None","test_src":"assert f(3) == [1, 2, 3]\nprint('PASS')"}

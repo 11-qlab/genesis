@@ -1,0 +1,1 @@
+{"name":"missing_import","subtype":"module_missing","mechanism":"LLM fails to include necessary import statement, causing NameError","spec":"Write f(n) returning sqrt(n) using math.sqrt","impl_src":"def f(n):\n    import math\n    return math.sqrt(n)","base_src":"def f(*a, **k): return None","test_src":"assert f(4) == 2.0\nprint('PASS')"}

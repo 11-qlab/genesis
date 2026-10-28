@@ -1,0 +1,1 @@
+{"name":"parameter_type_mismatch","subtype":"type_error","mechanism":"Model returns incorrect type for a parameter, causing a TypeError.","spec":"Write f(x: int) -> int that returns x * 2.","impl_src":"def f(x):\n    return x * 2","base_src":"def f(*a, **k): return None","test_src":"assert f(3) == 6\nprint('PASS)"}

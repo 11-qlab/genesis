@@ -1,0 +1,1 @@
+{"name":"off_by_one","subtype":"list_indexing","mechanism":"Model uses 1-based indexing instead of 0-based","spec":"Write f(lst) returning the first element of the list.","impl_src":"def f(lst):\n    return lst[0]","base_src":"def f(*a, **k): return None","test_src":"assert f([10]) == 10\nprint('PASS)"}

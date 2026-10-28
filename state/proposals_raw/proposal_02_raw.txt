@@ -1,0 +1,1 @@
+{"name":"misplaced_parentheses","subtype":"operator_precedence","mechanism":"Model incorrectly groups terms, leading to wrong evaluation order","spec":"Write f(a,b,c) returning (a + b) * c.","impl_src":"def f(a,b,c):\n    return (a + b) * c","base_src":"def f(*a, **k): return None","test_src":"assert f(1,2,3) == 9\nprint('PASS)"}
