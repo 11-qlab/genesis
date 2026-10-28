@@ -73,3 +73,16 @@ __pycache__/
 *.sqlite3-shm
 *.sqlite3-wal
 *.log
+
+# Ground-truth artifacts (paper evidence, tracked)
+!state/anchor_verdicts.jsonl
+!state/heldout_verdicts.jsonl
+!state/quantum_verdicts.jsonl
+!state/minimal_differential.jsonl
+!state/anomalies.jsonl
+!state/attribution.jsonl
+!state/candidate_verdicts.jsonl
+!state/identifiability.jsonl
+
+# Transient (ignored)
+state/router_state.json
