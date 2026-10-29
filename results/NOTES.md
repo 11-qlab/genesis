@@ -125,3 +125,34 @@ that reduces blast radius is not a fix that eliminates the defect. The
 only protection is asserting the invariant directly: the model controls
 only the substitution argument.
 
+
+---
+
+## CORRECTION 2 (2026-10-30) — commit f1b08f1 contains mixed data
+
+`f1b08f1` reported n=20 per condition because `run_family.py` opened
+`--out` in append mode. `git checkout HEAD -- results/` restored the
+old buggy files, then the re-run appended to them. Each `runs_*.jsonl`
+contained 10 pre-fix + 10 post-fix records mixed together.
+
+Effect: `report_*.md` showed averages of pre-fix and post-fix data, not
+the post-fix result. Specifically:
+
+  allam C prompt_patch: reported 11/20 (55%)  →  new-fix only: 10/10
+  allam D prompt_patch: reported 16/20 (80%)  →  new-fix only: 10/10
+  qwen  C prompt_patch: reported 12/20 (60%)  →  new-fix only: 10/10
+
+McNemar was inconsistent with report.py: it pairs by (family, task_id),
+and with two records per key the dict overwrite kept only the last
+(new) entry. So report.py showed mixed averages while mcnemar.py
+analyzed new data only — internal contradiction.
+
+Fix: run_family.py now truncates `--out` by default and requires explicit
+`--append` for the 2nd+ writes in a grid run. Full grid re-run in
+this correction commit. Files now contain 60 records per model, 10 per
+condition, single-run.
+
+Lesson: a file write whose mode ("a" vs "w") depends on caller context
+is a footgun. Every tool that writes a named file should default to
+truncate and require an explicit flag to append. The mixed n=20 output
+is what happens when the default is the less-safe option.

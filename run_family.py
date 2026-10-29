@@ -153,13 +153,15 @@ def main() -> int:
                     help="repeats per task (use 1 for live; >1 for simulate variance)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--simulate", action="store_true")
+    ap.add_argument("--append", action="store_true",
+                    help="append to --out instead of overwriting (default: truncate)")
     args = ap.parse_args()
 
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     rng = random.Random(args.seed)
     tasks = families.get(args.family)
     n = 0
-    with open(args.out, "a") as f:
+    with open(args.out, "a" if args.append else "w") as f:
         for task in tasks:
             for _ in range(args.repeats):
                 rec = run_task(task, args.family, args.condition, args.simulate, rng)
