@@ -120,9 +120,8 @@ def run_task(task: dict, family: str, condition: str, simulate: bool, rng: rando
                 key, _ = step["expect_arg"]
                 if prior_obs is not None:
                     produced = call_model(task, prior_obs, condition)
-                    # Merge: only override args the model returned (should be just `key`)
-                    # Only override the substitution key; task args (path, tool)
-                    # are ground truth and must not be model-controlled.
+                                        # Merge: model can only override the substitution key;
+                    # every other arg is task-owned ground truth (bug #8 guard).
                     for k, v in produced.get("args", {}).items():
                         if k == key:
                             args[k] = v
@@ -132,7 +131,17 @@ def run_task(task: dict, family: str, condition: str, simulate: bool, rng: rando
                 key, _ = step["expect_arg"]
                 got = str(args.get(key, "")).strip()
                 expected = str(prior_obs).strip() if prior_obs is not None else ""
-                ok = (prior_obs is not None) and (got == expected)
+                # In-memory check
+                mem_ok = (prior_obs is not None) and (got == expected)
+                # On-disk check (if fs_write)
+                disk_ok = True
+                if step["tool"] == "fs_write":
+                    try:
+                        disk_content = Path(args["path"]).read_text(encoding="utf-8")
+                        disk_ok = (disk_content.strip() == expected)
+                    except Exception:
+                        disk_ok = False
+                ok = mem_ok and disk_ok
                 placeholder = ("<" in got and "PLACEHOLDER" in got and got != expected)
                 return RunRecord(run_id, family, task["id"], condition,
                                  ok, "live", placeholder)

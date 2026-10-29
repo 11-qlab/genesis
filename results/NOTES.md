@@ -156,3 +156,95 @@ Lesson: a file write whose mode ("a" vs "w") depends on caller context
 is a footgun. Every tool that writes a named file should default to
 truncate and require an explicit flag to append. The mixed n=20 output
 is what happens when the default is the less-safe option.
+
+---
+
+## Bug #10 — regression from over-hardening (2026-10-30)
+
+The path-invariant assertion added to prevent bug #8 regression turned
+out to be too strict: it fired on any model response that included a
+`path` key, even though the `if k == key` guard already dropped that
+value before it reached the task args. Result: every baseline and
+prompt_patch call raised AssertionError; every executor call passed.
+The reported grid for gpt-oss was 0/10 / 0/10 / 10/10 with 10 errors
+in every baseline cell — a false deflation that looked like a
+model-capability failure.
+
+Fix: removed the assert. The correct regression guard is not "model
+never returned path" (model behavior we don't control); it's "harness
+never assigned model's path to task args" (harness behavior we do
+control), and the `if k == key` guard already enforces that.
+
+The on-disk content verification (read the file back after fs_write,
+compare to prior_obs) is retained.
+
+Lesson (same shape as bug #8): an incremental fix that tightens a
+guard can over-tighten it and break the working case. The invariant to
+assert is the one the code enforces, not a stricter property the model
+happens to satisfy.
+
+This is the 10th harness bug found in one session, and the second
+introduced by a fix for an earlier bug. The pattern is stable: fixes
+need to be scoped to the actual defect, not to the general area.
+
+---
+
+## Bug #11 — merge loop lost by drop_assert.py (2026-10-30)
+
+The drop_assert.py patch (fixing bug #10) replaced the assert block with
+9 lines of comments but deleted the merge loop itself. The
+`for k, v in produced...` / `if k == key` / `args[k] = v` lines vanished.
+
+Signature if auth had been working: baseline/prompt_patch cells would
+have shown success=False, placeholders=1, errors=0 (placeholder written
+to disk; on-disk check compared placeholder to prior_obs and failed).
+Auth was broken first, so the audit saw AuthenticationError 401 x 10,
+which presented as errors=10 — masking bug #11 behind bug #12 (auth).
+
+Restored in the commit that supersedes this note. The merge loop now
+sits between `produced = call_model(...)` and `out = dispatch(...)` with
+clean two-line comment and no assert.
+
+## Audit result (2026-10-30) — the answer to "94.3% → 65.5%"
+
+verify_100.py replayed every claimed-100% cell from commit 8fd4161:
+14 cells × 3 repeats = 42 runs.
+
+Result: 14/14 VERIFIED at 30/30. 0/14 INFLATED.
+
+The 100% claims in the committed grid survive independent replay. The
+paper's "harness inflates, audit reveals lower" pattern did not apply
+here. The interim INFLATED verdicts (2 cells, then 8 cells) were harness
+bugs #10 and #11 respectively, not claim inflation.
+
+The 4 sub-100% cells (gpt-oss D baseline 9/10, qwen D baseline 6/10,
+allam C/D baseline 0/10) are already documented above as variance-prone
+samples, not point estimates. The audit did not cover them because
+verify_100.py audits only claimed-100% cells by design.
+
+## Fix-chain hazard — the methodology finding
+
+| Bug | Introduced by | Caught by |
+|-----|---------------|-----------|
+| #3  | original code | manual review |
+| #8  | fix for #3    | commit-message inconsistency (10/10 vs 55%) |
+| #10 | fix for #8    | full grid re-run showed 0/10 |
+| #11 | fix for #10   | independent replay (verify_100.py) |
+
+Five bugs in one session. Two introduced by fixes for earlier bugs (#10,
+#11). Both caught only by out-of-band checks — the diff looked correct,
+the file parsed, report.py and mcnemar.py produced numbers. Only
+verify_100.py, a separate mechanism that re-verifies the claim from
+scratch, caught them.
+
+**Incremental fixes introduce defects faster than manual review catches
+them.** A fix that appears correct in the diff can silently delete code
+(bug #11), tighten a guard past its scope (bug #10), or reduce blast
+radius without eliminating a defect (bug #8). The only reliable detector
+is an independent mechanism that re-verifies the claim from scratch,
+not a re-read of the diff and not a re-run of in-band tests.
+
+For agent benchmark work, this suggests: every claim in a benchmark
+report should be accompanied by an audit script that independently
+regenerates it. `verify_100.py` is 60 lines. The reason most agent
+benchmark results are trusted is that nobody runs an equivalent.

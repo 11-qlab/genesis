@@ -1,0 +1,18 @@
+                 model fam            cond  commit   replay    rate   verdict
+--------------------------------------------------------------------------------
+   openai/gpt-oss-120b   C        baseline   10/10    30/30  100.0%  VERIFIED
+   openai/gpt-oss-120b   C    prompt_patch   10/10    30/30  100.0%  VERIFIED
+   openai/gpt-oss-120b   C  executor_patch   10/10    30/30  100.0%  VERIFIED
+   openai/gpt-oss-120b   D    prompt_patch   10/10    30/30  100.0%  VERIFIED
+   openai/gpt-oss-120b   D  executor_patch   10/10    30/30  100.0%  VERIFIED
+      qwen/qwen3.8-27b   C        baseline   10/10    30/30  100.0%  VERIFIED
+      qwen/qwen3.8-27b   C    prompt_patch   10/10    30/30  100.0%  VERIFIED
+      qwen/qwen3.8-27b   C  executor_patch   10/10    30/30  100.0%  VERIFIED
+      qwen/qwen3.8-27b   D    prompt_patch   10/10    30/30  100.0%  VERIFIED
+      qwen/qwen3.8-27b   D  executor_patch   10/10    30/30  100.0%  VERIFIED
+            allam-2-7b   C    prompt_patch   10/10    30/30  100.0%  VERIFIED
+            allam-2-7b   C  executor_patch   10/10    30/30  100.0%  VERIFIED
+            allam-2-7b   D    prompt_patch   10/10    30/30  100.0%  VERIFIED
+            allam-2-7b   D  executor_patch   10/10    30/30  100.0%  VERIFIED
+
+0 inflated of 14 claimed-100% cells
