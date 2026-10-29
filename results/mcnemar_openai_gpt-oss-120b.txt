@@ -1,0 +1,3 @@
+family   n  b(fix)  c(reg)    p_raw     p_bh
+     C  10       0       0   1.0000   1.0000
+     D  10       1       0   1.0000   1.0000

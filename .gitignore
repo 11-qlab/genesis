@@ -86,3 +86,10 @@ __pycache__/
 
 # Transient (ignored)
 state/router_state.json
+
+# Cross-tool substitution session (2026-10-29)
+run_family.py.bak*
+run_family.py.pre_*
+shim.db
+results/diagnose.log
+results/diag_*.log
