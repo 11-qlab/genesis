@@ -121,8 +121,11 @@ def run_task(task: dict, family: str, condition: str, simulate: bool, rng: rando
                 if prior_obs is not None:
                     produced = call_model(task, prior_obs, condition)
                     # Merge: only override args the model returned (should be just `key`)
+                    # Only override the substitution key; task args (path, tool)
+                    # are ground truth and must not be model-controlled.
                     for k, v in produced.get("args", {}).items():
-                        args[k] = v
+                        if k == key:
+                            args[k] = v
 
             out = dispatch(step["tool"], args)
             if step.get("expect_arg"):

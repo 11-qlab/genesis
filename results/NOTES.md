@@ -50,3 +50,78 @@ contaminated by an undiagnosed prompt-shape interaction.
 
 Action: diagnose one qwen C prompt_patch error and one allam C prompt_patch
 error before the next statistical claim.
+
+---
+
+## CORRECTION (2026-10-30) — supersedes the anomaly note above
+
+The prompt_patch errors described in the section above (qwen-C 8 err,
+allam-C 9 err) were **not** caused by `<OBSERVATION>` tags breaking JSON.
+That diagnosis was wrong.
+
+### Actual cause: harness bug #8 (incomplete fix of bug #3)
+
+The merge block read:
+
+    for k, v in produced.get("args", {}).items():
+        args[k] = v
+
+This lets the model override **any** arg it returns, including `path`.
+When the harder prompt caused the model to include a `path` field in its
+response (e.g. `"."`, `"path/to/file"`), the model's path replaced the
+ground-truth path and `_fs_write` raised `IsADirectoryError`.
+
+### Fix
+
+    for k, v in produced.get("args", {}).items():
+        if k == key:
+            args[k] = v
+
+Model controls only the substitution argument; every other arg is ground
+truth from the task dict.
+
+### Effect of the fix (grid re-run with `if k == key`)
+
+| Model | C base | C pp | C exec | D base | D pp | D exec |
+|---|---|---|---|---|---|---|
+| gpt-oss-120b | 10/10 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 |
+| qwen3.8-27b | [fill] | [fill] | 10/10 | [fill] | [fill] | 10/10 |
+| allam-2-7b   | 0/10 | **10/10** | 10/10 | 0/10 | **10/10** | 10/10 |
+
+The allam result is the sharpest: baseline 0/10 both families,
+prompt_patch 10/10 both families. Complete prompt-fixability at 7B
+once the harness stops letting the model corrupt non-substitution args.
+
+### qwen3.8-27b variance across identical runs
+
+Same code, same prompt, same tasks, `temperature=0`, `seed=42`:
+
+| run | C baseline |
+|---|---|
+| 1 | 10/10 (0 err) |
+| 2 |  9/10 (1 err) |
+| 3 | 10/10 (0 err) |
+| 4 |  5/10 (5 err) |
+| 5 | [current re-run] |
+
+The variance is ~50 percentage points on identical inputs. This is a
+property of qwen3.8-27b / Groq at 27B, not the harness. Any single-run
+qwen number must be reported as a sample from this distribution.
+
+### Bug #8 — methodology lesson
+
+    Stage          Code                                            Blast radius
+    Bug #3         args = produced["args"]                         all args
+    "Fix" for #3   for k,v in produced["args"].items(): args[k]=v  any arg
+    Bug #8 fix     if k == key: args[k] = v                        substitution only
+
+The "fix" for bug #3 reduced the blast radius from all-args to any-arg.
+The report showed errors=40 → errors=0, so the bug appeared fixed. The
+underlying defect (harness trusts model-controlled args) survived,
+hidden, until a prompt change caused the model to return an extra arg.
+
+**Incremental fixes can hide a defect without eliminating it.** A fix
+that reduces blast radius is not a fix that eliminates the defect. The
+only protection is asserting the invariant directly: the model controls
+only the substitution argument.
+
